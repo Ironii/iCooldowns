@@ -333,7 +333,7 @@ function iCD:GetGenerals(specID)
 					return GetItemCount(171267) or 0 -- Spiritual Healing Potion
 				end,
 			},
-			[-86125] = { -- Greater Holy Protection Potion (DPS potion)
+			[-86125] = { -- Kafa Press (DPS potion)
 				utility = true,
 			},
 			[-109076] = { -- Goblin Glider Kit
@@ -445,6 +445,7 @@ function iCD:GetGenerals(specID)
 			[295048] = { -- Touch of the Everlasting , essence
 				showFunc = function() return iCD:Essences(33, true) end,
 			},
+			[327694] = {},-- Guardian Faerie
 		}
 		t.buffsI = {
 			[297108] = { -- Blood of the enemy (debuff), essence

@@ -497,7 +497,7 @@ function iCD:updateFrame(id, row)
 		local gS, gcdD = GetSpellCooldown(iCD.gcd)
 		local gCD = gS+gcdD-GetTime()
 		gcdInfo = {
-			left = gCD,
+			left = gCD > 0 and gCD or 0,
 			duration = gcdD,
 			start = gS,
 			lastFrame = GetTime()
@@ -1572,13 +1572,17 @@ function iCD:UpdateSkills()
 				end
 			end
 			if v.glowSound then
+				local glowSoundSpellID = k
+				if type(v.glow) == 'number' then
+					glowSoundSpellID = v.glow
+				end
 				if type(v.glowSound) == 'boolean' then
-					iCD.glowSoundEffects[k] = sounds.default
+					iCD.glowSoundEffects[glowSoundSpellID] = sounds.default
 				else
 					if sounds[v.glowSound] then
-						iCD.glowSoundEffects[k] = sounds[v.glowSound]
+						iCD.glowSoundEffects[glowSoundSpellID] = sounds[v.glowSound]
 					else
-						iCD.glowSoundEffects[k] = v.glowSound
+						iCD.glowSoundEffects[glowSoundSpellID] = v.glowSound
 					end
 				end
 			end
@@ -1974,6 +1978,8 @@ function addon:COMBAT_LOG_EVENT_UNFILTERED()
 				iCD.customSpellTimers[spellID] = GetTime() + 30
 			elseif spellID == 311648 then -- DK, Swarming Mist
 				iCD.customSpellTimers[spellID] = GetTime() + 60
+			elseif spellID == 157153 then -- Shaman, Cloudburst Totem
+				iCD.customSpellTimers[spellID] = GetTime() + 15
 			end
 		elseif event == 'SPELL_PERIODIC_DAMAGE' then
 			if spellID == 55078 then

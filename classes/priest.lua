@@ -10,10 +10,18 @@ function iCD:PRIEST(specID)
 			covenant = iCD.covenants.NIGHTFAE
 		},
 	}
-	temp.all.row2 = {}
+	temp.all.row2 = {
+		[19236] = { -- Desperate Prayer
+			order = 10,
+		},
+		[10060] = { -- Power Infusion
+			order = 6,
+			showTimeAfterCast = true,
+		},
+	}
 	temp.all.row3 = {}
 	temp.all.row4 = {
-		[19236] = {}, -- Desperate Prayer
+		
 	}
 	temp.all.row5 = {}
 	temp.all.buffsC = {}
@@ -156,46 +164,64 @@ function iCD:PRIEST(specID)
 			end,
 		}
 		t.row1 = {
-			[33076] = { -- Prayer of Mending
-				order = 1,
+
+			[204883] = { -- Circle of Healing
+				order = 5,
 				cost = true,
+				showTimeAfterCast = true,
 			},
-			[208065] = { -- Light of T'uure (artifact)
-				order = 2,
-				charges = true,
-				stack = true,
+			[33076] = { -- Prayer of Mending
+				order = 8,
+				cost = true,
+				showTimeAfterCast = true,
 			},
 			[2050] = { -- Holy Word: Serenity
-				order = 3,
+				order = 13,
 				cost = true,
+				showTimeAfterCast = true,
 			},
 			[34861] = { -- Holy Word: Sanctify
-				order = 4,
+				order = 15,
 				cost = true,
+				showTimeAfterCast = true,
+			},
+			[32379] = { -- Shadow Word: Death
+				range = true,
+				order = 18,
+				glow = true,
+				charges = true,
+				stack = true,
+				glowSound = "text2",
 			},
 			[14914] = { -- Holy Fire
-				order = 7,
+				order = 20,
 				cost = true,
 				range = true,
 				glow = true,
 				glowSound = true,
+				showTimeAfterCast = true,
 			},
 		}
 		t.row2 = {
 			[200183] = { -- Apotheosis
-				order = 5,
+				order = 12,
 				ignoreGCD = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(7, 1, 1))
+					return select(4, GetTalentInfo(7, 2, 1))
 				end,
 			},
-			[19236] = { -- Desperate Prayer
-				order = 7,
+			[265202] = { -- Holy World: Salvation
+				order = 13,
 				ignoreGCD = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 3, 1))
+				end,
+				showTimeAfterCast = true,
 			},
 			[64843] = { -- Divine Hymn
 				order = 8,
 				cost = true,
+				showTimeAfterCast = true,
 			},
 			[586] = { -- Fade
 				order = 20,
@@ -214,6 +240,7 @@ function iCD:PRIEST(specID)
 			[213634] = {}, -- Purify Disease
 			[32375] = {}, -- Mass Dispel
 			[88625] = {}, -- Holy Word: Chastise
+			[64901] = {}, -- Symbol of Hope
 		}
 		t.buffsC = {
 		}
@@ -223,9 +250,17 @@ function iCD:PRIEST(specID)
 			},
 			[200183] = { -- Apotheosis
 				showFunc = function()
-					return select(4, GetTalentInfo(7, 1, 1))
+					return select(4, GetTalentInfo(7, 2, 1))
 				end,
-			}
+			},
+			[321379] = { -- Prayer Circle
+				showFunc = function()
+					return select(4, GetTalentInfo(5, 3, 1))
+				end,
+			},
+			[114255] = { -- Surge of Light
+				stack = true,
+			},
 		}
 	elseif specID == 258 then --Shadow
 		iCD.outOfRangeSpells = {
@@ -250,6 +285,8 @@ function iCD:PRIEST(specID)
 							return ''
 						end
 				end,
+				glow = 343355,
+				glowSound = true,
 				showTimeAfterCast = true,
 			},
 			[8092] = { -- Mind Blast
@@ -290,15 +327,12 @@ function iCD:PRIEST(specID)
 		}
 		t.row2 = {
 			[228260] = { -- Void Eruption
-				order = 5,
+				order = 3,
 				showTimeAfterCast = true,
 			},
 			[34433] = { -- Shadowfiend
-				order = 6,
+				order = 5,
 				showTimeAfterCast = true,
-			},
-			[17] = { -- Power Word: Shield
-				order = 7,
 			},
 			[586] = { -- Fade
 				order = 9,
@@ -314,14 +348,14 @@ function iCD:PRIEST(specID)
 		t.row3 = {
 			[34914] = { -- Vampiric Touch
 				order = 4,
-				customText = function()
+				customText = function(data, gcdInfo)
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Vampiric Touch', true)
 					if expirationTime then
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -330,14 +364,14 @@ function iCD:PRIEST(specID)
 			},
 			[589] = { -- Shadow Word:Pain
 				order = 3,
-				customText = function()
+				customText = function(data, gcdInfo)
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Shadow Word: Pain', true)
 					if expirationTime then
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -346,14 +380,14 @@ function iCD:PRIEST(specID)
 			},
 			[335467] = { -- Devouring Plague
 				order = 5,
-				customText = function()
+				customText = function(data, gcdInfo)
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Devouring Plague', true)
 					if expirationTime then
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -381,9 +415,14 @@ function iCD:PRIEST(specID)
 				end,
 			},
 		}
+		t.row5 = {
+			[47585] = {}, -- Dispersion
+		}
 		t.buffsC = {
 		}
 		t.buffsI = {
+			[194249] = {}, -- Voidform
+			[15286] = {}, -- Vampiric Embrace
 		}
 	end
 	return temp

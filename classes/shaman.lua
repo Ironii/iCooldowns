@@ -292,6 +292,7 @@ function iCD:SHAMAN(specID)
 			[187878] = {}, -- Crash Lightning (cleave)
 		}
 	elseif specID == 264 then -- Restoration
+		iCD.customSpellTimers[157153] = 0
 		iCD.outOfRangeSpells = {
 			main = "Flame Shock",
 			range = "Flame Shock"
@@ -356,6 +357,15 @@ function iCD:SHAMAN(specID)
 				range = true,
 				showTimeAfterCast = true,
 			},
+			[197995] = { -- Wellspring
+				order = 4,
+				cost = true,
+				range = true,
+				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 2, 1))
+				end,
+			},
 			[5394] = {
 				-- Healing Stream Totem
 				order = 7,
@@ -386,18 +396,15 @@ function iCD:SHAMAN(specID)
 			},
 		}
 		t.row2 = {
-			[79206] = {
-				-- Spiritwalker's grace
+			[79206] = { -- Spiritwalker's grace
 				order = 2
 			},
 
-			[108280] = {
-				-- Healing tide totem
+			[108280] = { -- Healing tide totem
 				order = 4,
 				showTimeAfterCast = true,
 			},
-			[98008] = {
-				-- Spirit Link Totem
+			[98008] = { -- Spirit Link Totem
 				order = 5,
 				showTimeAfterCast = true,
 			},
@@ -447,7 +454,21 @@ function iCD:SHAMAN(specID)
 			[157504] = {  -- Cloudburst Totem
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 3, 1))
-				end
+				end,
+				customText = function()
+					if iCD.customSpellTimers[157153] then
+						local dura =  iCD.customSpellTimers[157153] - GetTime()
+						if dura <= 0 then
+							return ' '
+						elseif dura > 5 then
+							return dura,'%.0f'
+						else
+							return dura, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
 			},
 			[188389] = {
 				-- Flame Shock
@@ -456,6 +477,10 @@ function iCD:SHAMAN(specID)
 			[53390] = {
 				-- Tidal Waves
 				stack = true
+			},
+			[338340] = { -- Swirling Currents
+				showFunc = function() return iCD:Soulbinds(118) end,
+				stack = true,
 			}
 		}
 	end

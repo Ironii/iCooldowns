@@ -438,6 +438,14 @@ function iCD:DRUID(specID)
 					return form == BEAR_FORM or form == 0 or form == 3
 				end,
 			},
+			[80313] = { -- Pulverize
+				order = 6,
+				range = true,
+				showFunc = function()
+					local form = GetShapeshiftFormID() or 0
+					return form == BEAR_FORM and select(4, GetTalentInfo(7, 3, 1))
+				end,
+			},
 			-- Caster form
 			[18562] = { -- Swiftmend
 				order = 5,
@@ -447,7 +455,7 @@ function iCD:DRUID(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
-			[339] = {
+			[339] = { -- Entangling Roots
 				order = 15,
 				range = true,
 				showFunc = function()
@@ -555,6 +563,9 @@ function iCD:DRUID(specID)
 		t.row5 = {
 			[61336] = {}, -- Survival Instincts
 			[22812] = {}, -- Barkskin
+			[80313] = { -- Pulverize
+				debuff = true,
+			},
 		}
 		t.buffsI = {
 			[22842] = {}, -- Frenzied Regeneration

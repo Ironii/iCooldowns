@@ -398,8 +398,8 @@ function iCD:PALADIN(specID)
 					return select(4, GetTalentInfo(5, 2, 1))
 				end,
 			},
-			[212641] = { -- Guardian of Ancient Kings
-			--[86659] = {
+			--[212641] = { -- Guardian of Ancient Kings
+			[86659] = {
 				order = 14,
 				ignoreGCD = true,
 			},

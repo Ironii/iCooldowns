@@ -164,26 +164,21 @@ function iCD:PRIEST(specID)
 			end,
 		}
 		t.row1 = {
-
-			[204883] = { -- Circle of Healing
-				order = 5,
+			[110744] = { -- Divine Star
+				order = 17,
 				cost = true,
 				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 2, 1))
+				end,
 			},
-			[33076] = { -- Prayer of Mending
-				order = 8,
+			[120517] = { -- Halo
+				order = 17,
 				cost = true,
 				showTimeAfterCast = true,
-			},
-			[2050] = { -- Holy Word: Serenity
-				order = 13,
-				cost = true,
-				showTimeAfterCast = true,
-			},
-			[34861] = { -- Holy Word: Sanctify
-				order = 15,
-				cost = true,
-				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 3, 1))
+				end,
 			},
 			[32379] = { -- Shadow Word: Death
 				range = true,
@@ -192,6 +187,7 @@ function iCD:PRIEST(specID)
 				charges = true,
 				stack = true,
 				glowSound = "text2",
+				range = true,
 			},
 			[14914] = { -- Holy Fire
 				order = 20,
@@ -201,11 +197,16 @@ function iCD:PRIEST(specID)
 				glowSound = true,
 				showTimeAfterCast = true,
 			},
+			[88625] = { -- Holy Word: Chastise
+				order = 22,
+				cost = true,
+				range = true,
+				showTimeAfterCast = true,
+			},
 		}
 		t.row2 = {
 			[200183] = { -- Apotheosis
 				order = 12,
-				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(7, 2, 1))
 				end,
@@ -233,13 +234,32 @@ function iCD:PRIEST(specID)
 			},
 		}
 		t.row3 = {
+			[204883] = { -- Circle of Healing
+				order = 20,
+				cost = true,
+				showTimeAfterCast = true,
+			},
+			[33076] = { -- Prayer of Mending
+				order = 15,
+				cost = true,
+				showTimeAfterCast = true,
+			},
+			[2050] = { -- Holy Word: Serenity
+				order = 5,
+				cost = true,
+				showTimeAfterCast = true,
+			},
+			[34861] = { -- Holy Word: Sanctify
+				order = 10,
+				cost = true,
+				showTimeAfterCast = true,
+			},
 		}
 		t.row4 = {
 			[73325] = {}, -- Leap of Faith
 			[528] = {}, -- Dispel Magic
 			[213634] = {}, -- Purify Disease
 			[32375] = {}, -- Mass Dispel
-			[88625] = {}, -- Holy Word: Chastise
 			[64901] = {}, -- Symbol of Hope
 		}
 		t.buffsC = {

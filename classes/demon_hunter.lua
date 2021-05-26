@@ -152,9 +152,14 @@ function iCD:DEMONHUNTER(specID)
 		t.buffsI = {
 			[162264] = {}, -- Metamorphosis
 			[275936] = { -- Seething Power
-			stack = true,
-			azerite = 245,
-		},
+				stack = true,
+				azerite = 245,
+			},
+			[347462] = { -- Unbound Chaos
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 2, 1))
+				end,
+			},
 		}
 		t.buffsC = {
 			[212800] = { -- Blur

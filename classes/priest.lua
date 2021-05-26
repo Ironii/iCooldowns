@@ -180,6 +180,33 @@ function iCD:PRIEST(specID)
 					return select(4, GetTalentInfo(6, 3, 1))
 				end,
 			},
+			[2061] = { -- Flash Heal
+				range = true,
+				order = 5,
+				glow = true,
+				stack = true,
+				glowSound = "text1",
+				customText = function()
+						local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Surge of Light')
+						if expirationTime then
+							local dura = expirationTime - GetTime()
+							if dura > 5 then
+								return dura,'%.0f'
+							else
+								return dura, '|cffff1a1a%.1f'
+							end
+						else
+							return ''
+						end
+				end,
+				stackFunc = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Surge of Light')
+						return count and count > 0 and count or ""
+				end,
+				showFunc = function()
+					return select(4, GetTalentInfo(5, 1, 1))
+				end,
+			},
 			[32379] = { -- Shadow Word: Death
 				range = true,
 				order = 18,
@@ -278,7 +305,7 @@ function iCD:PRIEST(specID)
 					return select(4, GetTalentInfo(5, 3, 1))
 				end,
 			},
-			[114255] = { -- Surge of Light
+			[336267] = { -- Flash Concentration (legendary)
 				stack = true,
 			},
 		}

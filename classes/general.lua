@@ -7,7 +7,6 @@ stack = true,
 glow = true,
 glowSound = true,
 stackFunc = function() return GetSpellCount(228477) end,
-charges = true,
 showFunc = function()
 	return select(4, GetTalentInfo(5, 1, 1))
 end,
@@ -152,8 +151,7 @@ function iCD:GetGenerals(specID)
 			[300728] = { -- Door of Shadows
 				order = 9999, -- Always last
 				covenant = iCD.covenants.VENTHYR,
-				charges = iCD:Soulbinds(1546),
-				stack = iCD:Soulbinds(1546),
+				stack = true,
 			},
 			[324631] = { -- Fleshcraft
 				order = 9999, -- Always last
@@ -165,8 +163,7 @@ function iCD:GetGenerals(specID)
 				order = -2,
 				range = true,
 				showTimeAfterGCD = true,
-				stack = iCD:Essences(12, true, 3),
-				charges = iCD:Essences(12, true, 3),
+				stack = true,
 				showFunc = function() return iCD:Essences(12, true) end,
 			}
 			t.row2[298357] = { -- Memory of Lucid Dreams, essence
@@ -179,8 +176,7 @@ function iCD:GetGenerals(specID)
 			t.row1[295373] = { -- The Crucible of Flame, essence
 				order = 12,
 				range = true,
-				stack = function() return iCD:Essences(12, true, 3) end,
-				charges = function() return iCD:Essences(12, true, 3) end,
+				stack = true,
 				showFunc = function() return iCD:Essences(12, true) end,
 				showTimeAfterGCD = true,
 			}
@@ -227,6 +223,12 @@ function iCD:GetGenerals(specID)
 				end,
 			},
 			[50613] = { -- Arcane Torrent ( Pain )
+				showFunc = function()
+					local _, race = UnitRace('player')
+					return race == 'BloodElf'
+				end,
+			},
+			[69179] = { -- Arcane Torrent ( Rage )
 				showFunc = function()
 					local _, race = UnitRace('player')
 					return race == 'BloodElf'
@@ -326,6 +328,7 @@ function iCD:GetGenerals(specID)
 			[-173944] = {}, -- Forbidden Obsidian Claw
 			[-178811] = {}, -- Grim Codex
 			[-184031] = {}, -- Sanguine Vintage
+			[-184020] = {}, -- Tuft of Smoldering Plumage
 			[-13446] = { -- Major Combat Healing Potion (HP potion cd)
 				utility = true,
 				stack = true,
@@ -365,6 +368,10 @@ function iCD:GetGenerals(specID)
 					return GetItemCount(132516) or 0
 				end,
 			},
+			[-186424] = {}, -- Shard of Annhylde's Aegis
+			[-186428] = {  -- Shadowed Orb of Torment
+				ignoreGCD = true,
+			},
 		}
 		t.row5 = { -- Buffs
 			[310143] = { -- Soulshape
@@ -378,29 +385,8 @@ function iCD:GetGenerals(specID)
 			[102342] = {}, -- Ironbark
 			[47788] = {}, -- Guardian Spirit
 			[33206] = {}, -- Pain Suppression
-			[235169] = { -- Archimonde's Hatred Reborn
-				stack = true,
-				stackFunc = function()
-					local v = select(5, iCD.UnitBuff('player', "Archimonde's Hatred Reborn", nil, 'player'))
-					if v then
-						return v/1e3, '%.1f'
-					else
-						return ''
-					end
-				end,
-				itemReq = 144249,
-			},
-			[251946] = { -- Smoldering Titanguard
-				stack = true,
-				stackFunc = function()
-					local v = select(4, iCD.UnitBuff('player', 'Bulwark of Flame', nil, 'player'))
-					if v then
-						return v/1e3, '%.1f'
-					else
-						return ''
-					end
-				end,
-				itemReq = 151978,
+			[116841] = {  -- Tiger's Lust
+				stack = "+M",
 			},
 			[313060] = { -- Stoneskin
 				stack = true,
@@ -446,6 +432,24 @@ function iCD:GetGenerals(specID)
 				showFunc = function() return iCD:Essences(33, true) end,
 			},
 			[327694] = {},-- Guardian Faerie
+			[358712] = { -- Shard of Annhylde's Aegis
+				itemReq = 186424,
+			},
+			[324867] = { -- Fleshcraft
+				covenant = iCD.covenants.NECROLORD,
+				stack = true,
+				stackFunc = function()
+					local amount = select(4, iCD.UnitBuff('player', 'Fleshcraft'))
+					if amount then
+						return math.floor(amount/1e3)
+					else
+						return ""
+					end
+				end
+			},
+			[121557] = { -- Angelic Feather
+				stack = "+M",
+			},
 		}
 		t.buffsI = {
 			[297108] = { -- Blood of the enemy (debuff), essence
@@ -462,9 +466,17 @@ function iCD:GetGenerals(specID)
 				showFunc = function() return iCD:Essences(34) end,
 				stack = "+D",
 			},
-
+			[10060] = { -- Power Infusion
+				stack = "+H"
+			},
 		}
 		t.buffsC = {
+			[356042] = { -- Soul Fragment (domination socket)
+				stack = true,
+			},
+			[356043] = { -- Chaos Bane (domination socket)
+				stack = "+P",
+			},
 			[299054] = { -- Pocket-Sized Computation Device (dodge)
 				itemReq = 167555,
 				stack = true,
@@ -520,7 +532,6 @@ function iCD:GetGenerals(specID)
 				stack = '+H',
 				itemReq = 133644, -- Memento of Angerboda
 			},
-			[116841] = {}, -- Tiger's Lust
 			[225130] = { -- Vampiric Aura
 				stack = '+L',
 				itemReq = 140797, -- Fang of Tichondrius

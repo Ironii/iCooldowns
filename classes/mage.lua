@@ -97,7 +97,6 @@ function iCD:MAGE(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 1, 1))
 				end,
-				charges = true,
 				stack = true,
 				ignoreGCD = true,
 			},
@@ -154,7 +153,6 @@ function iCD:MAGE(specID)
 			[194466] = { -- Phoenix's Flames
 				range = true,
 				cost = true,
-				charges = true,
 				stack = true,
 				order = 5,
 				showFunc = function()
@@ -164,7 +162,6 @@ function iCD:MAGE(specID)
 			[108853] = { -- Fire Blast
 				range = true,
 				cost = true,
-				charges = true,
 				stack = true,
 				order = 6,
 			},
@@ -195,7 +192,6 @@ function iCD:MAGE(specID)
 			},
 			[116011] = { -- Rune of Power
 				order = 4,
-				charges = true,
 				stack = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(3, 3, 1))
@@ -220,7 +216,6 @@ function iCD:MAGE(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
 				end,
-				charges = true,
 				stack = true,
 				ignoreGCD = true,
 			},
@@ -353,7 +348,6 @@ function iCD:MAGE(specID)
 			},
 			[108839] = { -- Ice Floes
 				order = 5,
-				charges = true,
 				ignoreGCD = true,
 				stack = true,
 				showFunc = function()
@@ -389,7 +383,6 @@ function iCD:MAGE(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
 				end,
-				charges = true,
 				stack = true,
 				ignoreGCD = true,
 			},

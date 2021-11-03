@@ -1,4 +1,4 @@
-## Interface: 70000
+## Interface: 90105
 ## Title: iCooldowns
 ## Notes: iCooldowns
 ## Author: Ironi

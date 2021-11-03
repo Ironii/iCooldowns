@@ -90,7 +90,8 @@ iCD.setups = {
       to = "bottom",
       x = 0,
       y = 470,
-    }
+    },
+    inverted = true,
   },
   ehText = {
     fontSize = 16,

@@ -201,7 +201,6 @@ function iCD:ROGUE(specID)
 			[13877] = { -- Blade Flurry
 				order = 5,
 				stack = true,
-				charges = true,
 			},
 			[137619] = { -- Marked for Death
 				order = 10,
@@ -312,7 +311,6 @@ function iCD:ROGUE(specID)
 				order = 5,
 			},
 			[185313] = { -- Shadow Dance
-				charges = true,
 				stack = true,
 				order = 3,
 				ignoreGCD = true,
@@ -324,7 +322,6 @@ function iCD:ROGUE(specID)
 			[36554] = { -- Shadow Step
 				order = 8,
 				ignoreGCD = true,
-				charges = true,
 				stack = true,
 				range = true,
 			},

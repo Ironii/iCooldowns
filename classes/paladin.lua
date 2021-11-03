@@ -51,6 +51,7 @@ function iCD:PALADIN(specID)
 		[62124] = { -- Hand of Reckoning
 			ignoreGCD = true,
 		},
+		[10326] = {}, -- Turn Evil
 	}
 	temp.all.row5 = {
 		[642] = {}, -- Divine Shield
@@ -71,15 +72,6 @@ function iCD:PALADIN(specID)
 		iCD.outOfRangeSpells = {
 			main = 'Crusader Strike',
 			range = "Judgment",
-		}
-		t.customPos = {
-			buffsI = {
-				from = "CENTER",
-				to = "CENTER",
-				x = 0,
-				y = -38,
-				horizontal = true,
-			},
 		}
 		t.power = {
 			func = function()
@@ -103,19 +95,12 @@ function iCD:PALADIN(specID)
 				glow = true,
 				glowSound = true,
 			},
-			[85222] = { -- Light of Dawn
-				order = 2,
-				cost = true,
-				glow = true,
-				glowSound = "text1",
-				showTimeAfterGCD = true,
-			},
 			[114165] = { -- Holy Prism
 				order = 3,
 				cost = true,
 				range = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(5, 2, 1))
+					return select(4, GetTalentInfo(2, 3, 1))
 				end,
 			},
 			[114158] = { -- Light's Hammer
@@ -135,20 +120,41 @@ function iCD:PALADIN(specID)
 				showTimeAfterGCD = true,
 			},
 			[35395] = { -- Crusader Strike
-				order = 6,
+				order = 8,
 				range = true,
 				stack = true,
-				charges = true,
 				showTimeAfterGCD = true,
 			},
 			[20271] = { -- Judgment
-				order = 7,
+				order = 11,
 				range = true,
 				cost = true,
 				showTimeAfterGCD = true,
+				stack = true,
+			},
+			[20271] = { -- Judgment
+				order = 11,
+				range = true,
+				cost = true,
+				showTimeAfterGCD = true,
+				stack = true,
+			},
+			[24275] = { -- Hammer of Wrath
+				glow = true,
+				order = 15,
+				range = true,
+				showTimeAfterGCD = true,
+				cost = true,
+				stack = true,
+				customCost = function()
+					local isUsable = IsUsableSpell("Hammer of Wrath")
+					if not isUsable then
+						return true
+					end
+				end,
 			},
 			[26573] = { -- Consecration
-				order = 8,
+				order = 20,
 				stack = true,
 				stackFunc = function()
 					if iCD.customSpellTimers[26573] then
@@ -172,9 +178,8 @@ function iCD:PALADIN(specID)
 				order = 2,
 				ignoreGCD = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(2, 3, 1))
+					return select(4, GetTalentInfo(4, 3, 1))
 				end,
-				charges = true,
 				stack = true,
 			},
 			[498] = { -- Divine Protection
@@ -196,7 +201,7 @@ function iCD:PALADIN(specID)
 			[105809] = { -- Holy Avenger
 				order = 7,
 				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
+					return select(4, GetTalentInfo(5, 2, 1))
 				end
 			},
 			[31821] = { -- Aura Mastery
@@ -210,10 +215,9 @@ function iCD:PALADIN(specID)
 		t.row3 = {}
 		t.row4 = {
 			[190784] = { -- Divine Steed
-				charges = true,
 				stack = true,
 				stackFunc = function()
-					if select(4, GetTalentInfo(2, 2, 1)) then
+					if select(4, GetTalentInfo(4, 2, 1)) then
 						local c = GetSpellCharges(190784)
 						return c
 					else
@@ -248,18 +252,6 @@ function iCD:PALADIN(specID)
 					return select(4, GetTalentInfo(5, 3, 1))
 				end
 			},
-			[216411] = { -- Divine Purpose (Holy Shock)
-				stack = "HS",
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 1, 1))
-				end
-			},
-			[216413] = { -- Divine Purpose (Light of Dawn)
-				stack = "LD",
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 1, 1))
-				end
-			},
 			[294027] = { -- Critical Chance
 				stack = "+C",
 			},
@@ -271,6 +263,12 @@ function iCD:PALADIN(specID)
 			[31884] = {}, -- Avenging Wrath
 			[214202] = {}, -- Rule of Law
 			[216331] = {}, -- Avenging Crusader
+			[339990] = { -- Untempered Dedication (conduit)
+				stack = true,
+			},
+			[340459] = { -- Maraad's Dying Breath
+				stack = true,
+			}
 		}
 		t.buffsC = {
 		}
@@ -319,7 +317,6 @@ function iCD:PALADIN(specID)
 			[204019] = { -- Blessed Hammer
 				order = 5,
 				stack = true,
-				charges = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(1, 3, 1))
 				end,
@@ -328,7 +325,6 @@ function iCD:PALADIN(specID)
 			[53595] = { -- Hammer of the Righteous
 				order = 5,
 				stack = true,
-				charges = true,
 				range = true,
 				customRangeSpell = 'Rebuke',
 				showFunc = function()
@@ -336,11 +332,11 @@ function iCD:PALADIN(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
-			[20271] = { -- Judgment
+			[275779] = { -- Judgment
 				order = 7,
 				range = true,
-				stack = select(4, GetTalentInfo(2, 2, 1)),
-				charges = select(4, GetTalentInfo(2, 2, 1)),
+				stack = true,
+				customRangeSpell = "Hand of Reckoning",
 				showTimeAfterGCD = true,
 			},
 			[26573] = { -- Consecration
@@ -374,6 +370,7 @@ function iCD:PALADIN(specID)
 						return true
 					end
 				end,
+				stack = true,
 			},
 		}
 		t.row2 = {
@@ -382,6 +379,8 @@ function iCD:PALADIN(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(5, 3, 1))
 				end,
+				showTimeAfterGCD = true,
+				cost = true,
 			},
 			[327193] = { -- Moment of Glory
 				order = 4,
@@ -418,7 +417,6 @@ function iCD:PALADIN(specID)
 		t.row3 = {}
 		t.row4 = {
 			[190784] = { -- Divine Steed
-				charges = true,
 				stack = true,
 				stackFunc = function()
 					if select(4, GetTalentInfo(4, 2, 1)) then
@@ -456,6 +454,7 @@ function iCD:PALADIN(specID)
 			[182104] = { -- Shining Light
 				stack = true,
 			},
+			[31884] = {}, -- Avenging Wrath
 		}
 		t.buffsC = {
 			[152262] = { -- Seraphim
@@ -463,7 +462,6 @@ function iCD:PALADIN(specID)
 					return select(4, GetTalentInfo(5, 3, 1))
 				end,
 			}, -- Seraphim
-			[31884] = {}, -- Avenging Wrath
 		}
 	elseif specID == 70 then --Retribution
 		--gcd = 19750,
@@ -488,7 +486,6 @@ function iCD:PALADIN(specID)
 				order = 2,
 				range = true,
 				stack = true,
-				charges = true,
 				showTimeAfterGCD = true,
 			},
 			[20271] = { -- Judgment
@@ -536,6 +533,14 @@ function iCD:PALADIN(specID)
 					return select(4, GetTalentInfo(7, 3, 1))
 				end,
 			},
+			[152262] = { -- Seraphim
+				order = 3,
+				showFunc = function()
+					return select(4, GetTalentInfo(5, 3, 1))
+				end,
+				showTimeAfterGCD = true,
+				cost = true,
+			},
 			[31884] = { -- Avenging Wrath
 				order = 4,
 				showFunc = function()
@@ -566,16 +571,7 @@ function iCD:PALADIN(specID)
 			},
 			[213644] = {}, -- Cleanse Toxins
 			[190784] = { -- Divine Steed
-				charges = true,
 				stack = true,
-				stackFunc = function()
-					if select(4, GetTalentInfo(4, 2, 1)) then
-						local c = GetSpellCharges(190784)
-						return c
-					else
-						return ''
-					end
-				end
 			},
 			[183218] = {}, -- Hand of Hindrance
 

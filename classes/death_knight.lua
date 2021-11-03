@@ -115,8 +115,7 @@ function iCD:DEATHKNIGHT(specID)
 			ignoreGCD = true,
 		}, 
 		[49576] = { -- Death Grip
-			stack = function() return iCD:Essences(32, true) end,
-			charges = function() return iCD:Essences(32, true) end
+			stack = true,
 		},
 		[48265] = {}, -- Death's Advance
 	}
@@ -187,7 +186,6 @@ function iCD:DEATHKNIGHT(specID)
 				order = 2,
 				row = 1,
 				stack = true,
-				charges = true,
 				showTimeAfterGCD = true,
 				level = 17,
 			},	
@@ -213,7 +211,6 @@ function iCD:DEATHKNIGHT(specID)
 			[194679] = { -- Rune Tap
 				order = 3,
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				level = 44,
 			},

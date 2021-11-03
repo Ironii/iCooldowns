@@ -230,8 +230,6 @@ function iCD:DRUID(specID)
 				order = 6,
 				range = true,
 				stack = true,
-				charges = true,
-
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 2, 1))
 				end,
@@ -472,7 +470,6 @@ function iCD:DRUID(specID)
 			},
 			[61336] = { -- Survival Instincts
 				order = 4,
-				charges = true,
 				stack = true,
 			},
 			[50334] = { -- Berserk
@@ -502,7 +499,6 @@ function iCD:DRUID(specID)
 			[22842] = { -- Frenzied Regeneration
 				order = 3,
 				stack = true,
-				charges = true,
 			},
 		}
 		t.row4 = {

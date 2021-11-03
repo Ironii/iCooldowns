@@ -7,7 +7,6 @@ stack = true,
 glow = true,
 glowSound = true,
 stackFunc = function() return GetSpellCount(228477) end,
-charges = true,
 showFunc = function()
 	return select(4, GetTalentInfo(5, 1, 1))
 end,
@@ -47,6 +46,10 @@ function iCD:WARRIOR(specID)
 		[64382] = {}, -- Shattering Throw
 		[12323] = {}, -- Piercing Howl
 		[5246] = {}, -- Intimidating Shout
+		[6673] = {}, -- Battle Shout
+		[100] = { -- Charge
+			stack = true,
+		},
 	}
 	temp.all.row5 = {
 		[23920] = {}, -- Spell Reflection
@@ -60,6 +63,10 @@ function iCD:WARRIOR(specID)
 		[324143] = {}, -- Conqueror's Banner
 		[107574] = {}, -- Avatar
 		[1719] = {}, -- Recklessness (lege?)
+		[324143] = {}, -- Conqueror's Banner
+		[335234] = { -- Ashen Juggernaut (conduit)
+			stack = true,
+		},
 	}
 	local t = temp.spec
 	t.row1 = {}
@@ -177,8 +184,7 @@ function iCD:WARRIOR(specID)
 				showTimeAfterGCD = true,
 				glow = true,
 				glowSound = true,
-				stack = select(4, GetTalentInfo(7, 2, 1)),
-				charges = select(4, GetTalentInfo(7, 2, 1)),
+				stack = true,
 			},
 			[260643] = { -- Skullsplitter
 				order = 7,
@@ -250,13 +256,8 @@ function iCD:WARRIOR(specID)
 		t.row4 = {
 			[18499] = {}, -- Berserker Rage
 			[355] = {}, -- Taunt
-			[100] = { -- Charge
-				stack = true,
-				charges = true,
-			},
 			[6544] = { -- Heroic Leap
-				charges = IsEquippedItem(143728),
-				stack = IsEquippedItem(143728),
+				stack = true,
 			},
 			[190456] = {}, -- Ignore Pain
 		}
@@ -351,7 +352,6 @@ function iCD:WARRIOR(specID)
 			[85288] = { -- Raging Blow
 				order = 4,
 				range = true,
-				charges = true,
 				stack = true,
 				showTimeAfterGCD = true,
 			},
@@ -419,14 +419,11 @@ function iCD:WARRIOR(specID)
 			[355] = { -- Taunt
 				ignoreGCD = true,
 			},
-			[100] = { -- charge
-				stack = select(4, GetTalentInfo(2, 1, 1)),
-				charges = select(4, GetTalentInfo(2, 1, 1)),
-			},
 			[6544] = {}, -- Heroic Leap
 			[57755] = {}, -- Heroic Throw
 			[5246] = {}, -- Intimidating Shout
 			[190456] = {}, -- Ignore Pain
+			[3411] = {}, -- Intervene
 		}
 		t.row5 = {
 			[184364] = {}, -- Enraged Regeneration
@@ -578,7 +575,6 @@ function iCD:WARRIOR(specID)
 			[2565] = { -- Shield Block
 				order = 2,
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				cost = true,
 				AM = function()
@@ -630,11 +626,6 @@ function iCD:WARRIOR(specID)
 				level = 29,
 			},
 			--[198304] = {}, -- Intercept
-			[100] = { -- Charge
-				charges = select(4, GetTalentInfo(2, 1, 1)),
-				stack = select(4, GetTalentInfo(2, 1, 1)),
-				level = 2,
-			},
 			[355] = {  -- Taunt
 				ignoreGCD = true,
 			},
@@ -642,8 +633,7 @@ function iCD:WARRIOR(specID)
 				level = 43,
 			},
 			[6544] = { -- Heroic Leap
-				charges = IsEquippedItem(143728),
-				stack = IsEquippedItem(143728),
+				stack = true,
 				level = 26,
 			},
 			[64382] = {}, -- Shattering Throw
@@ -734,7 +724,6 @@ function iCD:WARRIOR(specID)
 		t.row3 = {
 			[2565] = { -- Shield Block
 				stack = true,
-				charges = true,
 				cost = true,
 				level = 6,
 			},

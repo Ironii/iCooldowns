@@ -9,6 +9,11 @@ function iCD:PRIEST(specID)
 			showTimeAfterCast = true,
 			covenant = iCD.covenants.NIGHTFAE
 		},
+		[325013] = { -- Boon of the Ascended
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.KYRIAN
+		},
 	}
 	temp.all.row2 = {
 		[19236] = { -- Desperate Prayer
@@ -25,7 +30,11 @@ function iCD:PRIEST(specID)
 	}
 	temp.all.row5 = {}
 	temp.all.buffsC = {}
-	temp.all.buffsI = {}
+	temp.all.buffsI = {
+		[325013] = { -- Ascended Boon
+			stack = true,
+		},
+	}
 	local t = temp.spec
 	t.row1 = {}
 	t.row2 = {}
@@ -59,6 +68,12 @@ function iCD:PRIEST(specID)
 					return select(4, GetTalentInfo(3, 3, 1))
 				end,
 			},
+			[8092] = { -- Mind Blast
+				order = 5,
+				cost = true,
+				range = true,
+				showTimeAfterCast = true,
+			},
 			[214621] = { -- Schism
 				order = 6,
 				range = true,
@@ -71,7 +86,6 @@ function iCD:PRIEST(specID)
 			[194509] = { -- Power Word: Radiance
 				order = 7,
 				cost = true,
-				charges = true,
 				stack = true,
 			},
 			[120517] = { -- Halo
@@ -82,6 +96,12 @@ function iCD:PRIEST(specID)
 					return select(4, GetTalentInfo(6, 3, 1))
 				end,
 			},
+			[32379] = { -- Shadow Word: Death
+				order = 20,
+				range = true,
+				cost = true,
+				stack = true,
+			},
 		}
 		t.row2 = {
 			[62618] = { -- Power Word: Barrier
@@ -91,8 +111,10 @@ function iCD:PRIEST(specID)
 			[47536] = { -- Rapture
 				order = 8,
 				cost = true,
+				showFunc = function()
+					return not select(4, GetTalentInfo(7, 2, 1))
+				end,
 			},
-
 			[34433] = { -- Shadowfiend
 				order = 4,
 				showFunc = function()
@@ -116,12 +138,20 @@ function iCD:PRIEST(specID)
 			},
 			[33206] = { -- Pain Suppression
 				order = 7,
+				ignoreGCD = true,
 			},
 			[246287] = { -- Evangelism
 				order = 9,
 				range = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(7, 3, 1))
+				end,
+			},
+			[109964] = { -- Spirit Shell
+				order = 9,
+				range = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 2, 1))
 				end,
 			},
 		}
@@ -132,6 +162,12 @@ function iCD:PRIEST(specID)
 			[528] = {}, -- Dispel Magic
 			[213634] = {}, -- Purify Disease
 			[32375] = {}, -- Mass Dispel
+			[121536] = { -- Angelic Feather
+				showFunc = function()
+					return select(4, GetTalentInfo(2, 3, 1))
+				end,
+				stack = true,
+			},
 		}
 		t.buffsC = {
 		}
@@ -211,7 +247,6 @@ function iCD:PRIEST(specID)
 				range = true,
 				order = 18,
 				glow = true,
-				charges = true,
 				stack = true,
 				glowSound = "text2",
 				range = true,
@@ -288,6 +323,21 @@ function iCD:PRIEST(specID)
 			[213634] = {}, -- Purify Disease
 			[32375] = {}, -- Mass Dispel
 			[64901] = {}, -- Symbol of Hope
+			[204263] = { -- Shining Force
+				showFunc = function()
+					return select(4, GetTalentInfo(4, 3, 1))
+				end,
+			},
+			[8122] = {}, -- Psychis Scream
+			[121536] = { -- Angelic Feather
+				showFunc = function()
+					return select(4, GetTalentInfo(2, 3, 1))
+				end,
+				stack = true,
+			},
+		}
+		t.row5 = {
+			[27827] = {}, -- Spirit of Redemption
 		}
 		t.buffsC = {
 		}
@@ -308,6 +358,7 @@ function iCD:PRIEST(specID)
 			[336267] = { -- Flash Concentration (legendary)
 				stack = true,
 			},
+			[337948] = {}, -- Holy Oration (conduit)
 		}
 	elseif specID == 258 then --Shadow
 		iCD.outOfRangeSpells = {
@@ -343,14 +394,13 @@ function iCD:PRIEST(specID)
 				glowSound = true,
 				range = true,
 				showTimeAfterGCD = true,
-				charges = true,
 				stack = true,
 			},
 			[32379] = { -- Shadow Word: Death
 				range = true,
 				order = 6,
 				glow = true,
-				charges = true,
+				showTimeAfterCast = true,
 				stack = true,
 				glowSound = "text2",
 			},

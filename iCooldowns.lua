@@ -255,6 +255,7 @@ addon:SetScript("OnEvent", function(self, event, ...)
 end)
 iCD.customSpellTimers = {}
 --Health bar
+local invertedHPBar = iCD.setups.hpBar.inverted
 do
 	local c = iCD.setups.hpBar
 	iCD.hpBar = CreateFrame('Statusbar', 'iCD_Health', UIParent)
@@ -263,6 +264,9 @@ do
 	iCD.hpBar:SetHeight(c.height)
 	iCD.hpBar:SetStatusBarColor(c.defaultColor[1], c.defaultColor[2],	c.defaultColor[3], c.defaultColor[4])
 	iCD.hpBar:SetMinMaxValues(0,1)
+	if invertedHPBar then
+		iCD.hpBar:SetReverseFill(true)
+	end
 	iCD.hpBar:SetValue(0)
 	iCD.hpBar:SetPoint(c.position.from, UIParent, c.position.to, c.position.x,c.position.y)
 
@@ -484,6 +488,23 @@ function iCD:createTextString(id)
 		end
 	end
 end
+local function getGeneralCooldown(id)
+	if not id then -- gcd
+		local start, cooldown = GetSpellCooldown(61304)
+		return start, cooldown
+	end
+	if id < 0 then 
+		local start, cooldown = GetItemCooldown(-id)
+		return start, cooldown, nil, nil, true
+	else
+		local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(id)
+		if charges then
+			return chargeStart, chargeDuration, charges, maxCharges
+		end
+		local start, cooldown = GetSpellCooldown(id)
+		return start, cooldown
+	end
+end
 do
 	local gcdInfo = {
 		left = 0,
@@ -494,7 +515,7 @@ do
 function iCD:updateFrame(id, row)
 	local data = iCD.frames[row][id].data
 	if gcdInfo.lastFrame ~= GetTime() then -- TODO : Change whole function to use this
-		local gS, gcdD = GetSpellCooldown(iCD.gcd)
+		local gS, gcdD = getGeneralCooldown()
 		local gCD = gS+gcdD-GetTime()
 		gcdInfo = {
 			left = gCD > 0 and gCD or 0,
@@ -600,13 +621,18 @@ function iCD:updateFrame(id, row)
 				iCD.frames[row][id].cooldownText:SetText(text)
 			end
 		else
-			local gS, gcdD = GetSpellCooldown(iCD.gcd)
+			local gS, gcdD = getGeneralCooldown()
 			local gCD = gS+gcdD-GetTime()
 			local s, cd = 0,0
 			local readyDuringCast = false
 			if data.customDuration then
 				text = data.customDuration - GetTime()
 			elseif data.showTimeAfterGCD then
+				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+				if c and c == m then
+					s = 0
+				end
+				--[[
 				if data.charges then
 					local c,m,sd,d = GetSpellCharges(data.usedBy)
 					if c == m then
@@ -621,6 +647,7 @@ function iCD:updateFrame(id, row)
 				else
 					s,cd = GetSpellCooldown(data.usedBy)
 				end
+				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
 					if gcdD ~= cd then
@@ -632,6 +659,11 @@ function iCD:updateFrame(id, row)
 					end
 				end
 			elseif data.showTimeAfterCast then
+				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+				if c and c == m then
+					s = 0
+				end
+				--[[
 				if data.charges then
 					local c,m,sd,d = GetSpellCharges(data.usedBy)
 					if c == m then
@@ -646,6 +678,7 @@ function iCD:updateFrame(id, row)
 				else
 					s,cd = GetSpellCooldown(data.usedBy)
 				end
+				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
 					if gcdD ~= cd then
@@ -674,6 +707,11 @@ function iCD:updateFrame(id, row)
 					end
 				end
 			else
+				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+				if c and c == m then
+					s = 0
+				end
+				--[[
 				if data.charges then
 					local c,m,sd,d = GetSpellCharges(data.usedBy)
 					if c == m then
@@ -688,6 +726,7 @@ function iCD:updateFrame(id, row)
 				else
 					s,cd = GetSpellCooldown(data.usedBy)
 				end
+				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
 					if data.ignoreGCD or data.item then
@@ -789,8 +828,17 @@ function iCD:updateFrame(id, row)
 			iCD.frames[row][id].stackText:SetText(txt)
 		end
 	elseif data.stack then
-		local c,m,sd,d = GetSpellCharges(data.usedBy)
-		iCD.frames[row][id].stackText:SetText(c)
+		if type(data.stack) == "boolean" then
+			local s,cd,c,m = getGeneralCooldown(data.usedBy)
+			--local c,m,sd,d = GetSpellCharges(data.usedBy)
+			if m and m > 1 then
+				iCD.frames[row][id].stackText:SetText(c)
+			else
+				iCD.frames[row][id].stackText:SetText("")
+			end
+		else
+			iCD.frames[row][id].stackText:SetText(data.stack)
+		end
 	end
 end
 end
@@ -881,7 +929,11 @@ function iCD:updateCDs()
 	end
 	for k,v in pairs(iCD.onCD) do
 		local s, cd
-		local isItem = false
+		local s,cd,c,m,isItem = getGeneralCooldown(k)
+		if c and c == m then
+			s = 0
+		end
+		--[[
 		if v.charges then
 			local c,m,sd,d = GetSpellCharges(k)
 			if c == m then
@@ -897,13 +949,23 @@ function iCD:updateCDs()
 		else
 			s,cd = GetSpellCooldown(k)
 		end
+		--]]
 		local cdD = s+cd-GetTime()
 		local dura = 0
 		if s > 0 then
 			if isItem or v.ignoreGCD then
-				dura = cdD
+				if isItem and v.ignoreGCD then
+					local _,gcdD = getGeneralCooldown()
+					if s > 0 and cd == gcdD then
+						dura = 0
+					else
+						dura = cdD
+					end
+				else
+					dura = cdD
+				end
 			else
-				local gS, gcdD = GetSpellCooldown(iCD.gcd)
+				local gS, gcdD = getGeneralCooldown()
 				local gCD = gS+gcdD-GetTime()
 				if (gCD + 0.05) < cdD then
 					dura = cdD
@@ -936,7 +998,7 @@ function iCD:updateCDs()
 		if v.stackFunc then
 			iCD.frames.row4[id].data.stackFunc = v.stackFunc
 		elseif v.stack then
-			iCD.frames.row4[id].data.stack = true
+			iCD.frames.row4[id].data.stack = v.stack
 		end
 		if v.customText then
 			iCD.frames.row4[id].data.customText = v.customText
@@ -1085,7 +1147,7 @@ function iCD:updateBuffs()
 				if iCD.BuffsI[spellID] then
 					local data = {
 						endTime = expirationTime,
-						texture = icon,
+						texture = iCD.BuffsI[spellID].icon or icon,
 					}
 					if iCD.BuffsI[spellID].stack then
 						if iCD.BuffsI[spellID].stackFunc then
@@ -1104,7 +1166,7 @@ function iCD:updateBuffs()
 				if iCD.BuffsC[spellID] then
 					local data = {
 						endTime = expirationTime,
-						texture = icon,
+						texture = iCD.BuffsC[spellID].icon or icon,
 					}
 					if iCD.BuffsC[spellID].stack then
 						if iCD.BuffsC[spellID].stackFunc then
@@ -1306,7 +1368,7 @@ function iCD:updateBuffs()
 		if v.customText then
 			iCD.frames.buffsI[id].data.customText = v.customText
 		end
-		iCD.frames.buffsI[id].tex:SetTexture(v.icon or GetSpellTexture(k))
+		iCD.frames.buffsI[id].tex:SetTexture(v.texture or GetSpellTexture(k))
 		iCD.frames.buffsI[id].tex:SetVertexColor(1,1,1,1)
 		iCD.frames.buffsI[id].data.unMod = 'none'
 		iCD.frames.buffsI[id]:Show()
@@ -1335,7 +1397,7 @@ function iCD:updateBuffs()
 		if v.customText then
 			iCD.frames.buffsC[id].data.customText = v.customText
 		end
-		iCD.frames.buffsC[id].tex:SetTexture(v.icon or GetSpellTexture(k))
+		iCD.frames.buffsC[id].tex:SetTexture(v.texture or GetSpellTexture(k))
 		iCD.frames.buffsC[id].tex:SetVertexColor(1,1,1,1)
 		iCD.frames.buffsC[id].data.unMod = 'none'
 		iCD.frames.buffsC[id]:Show()
@@ -1468,7 +1530,7 @@ function iCD:UpdateSkills()
 	-- essences
 	if (C_AzeriteEssence.CanOpenUI()) then
 		for k,v in pairs (C_AzeriteEssence.GetMilestones() or {}) do
-			if v.slot == Enum.AzeriteEssence.MainSlot then
+			if v.slot == 0 then -- Mains Slot
 				local id = C_AzeriteEssence.GetMilestoneEssence(v.ID)
 				if id then
 					local e = C_AzeriteEssence.GetEssenceInfo(id)
@@ -1546,7 +1608,7 @@ function iCD:UpdateSkills()
 				end
 			end
 			if v.icon then
-				iCD.frames[row][id].data.icon = true
+				iCD.frames[row][id].data.icon = v.icon -- testing
 			end
 			if v.ignoreGCD then
 				iCD.frames[row][id].data.ignoreGCD = true
@@ -1755,7 +1817,7 @@ local function updateHealth()
 	elseif iCD.hpBar.anim then
 		iCD.hpBar.flash :Stop()
 	end
-	iCD.hpBar:SetValue(value)
+	iCD.hpBar:SetValue(invertedHPBar and 1-value or value)
 	local r = math.max(1-value+0.1, 0.1)
 	iCD.hpBar:SetStatusBarColor(r,0.1,0.1,1)
 	iCD.hpBar.bg:SetBackdropBorderColor(1-value,0,0,1)

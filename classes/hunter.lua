@@ -47,7 +47,6 @@ function iCD:HUNTER(specID)
 				order = 2,
 				range = true,
 				cost = true,
-				charges = true,
 				stack = true,
 				glow = true,
 				glowSound = true,
@@ -81,7 +80,6 @@ function iCD:HUNTER(specID)
 			[120679] = { -- Dire Beast
 				order = 14,
 				range = true,
-				charges = true,
 				stack = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(1, 3, 1))
@@ -293,7 +291,6 @@ function iCD:HUNTER(specID)
 				order = 2,
 				range = true,
 				stack = true,
-				charges = true,
 				glow = true,
 				glowSound = true,
 			},
@@ -301,7 +298,6 @@ function iCD:HUNTER(specID)
 				order = 4,
 				range = true,
 				stack = true,
-				charges = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 1, 1))
 				end,

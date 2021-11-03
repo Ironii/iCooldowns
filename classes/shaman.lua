@@ -49,8 +49,7 @@ function iCD:SHAMAN(specID)
 				-- Lava Burst
 				order = 3,
 				range = true,
-				stack = select(4, GetTalentInfo(1, 2, 1)),
-				charges = select(4, GetTalentInfo(1, 2, 1)),
+				stack = true,
 				glow = true,
 				glowSound = true,
 				showTimeAfterCast = true,
@@ -184,7 +183,6 @@ function iCD:SHAMAN(specID)
 			[193786] = { -- Rockbiter
 				order = 3,
 				range = true,
-				charges = true,
 				stack = true,
 				showTimeAfterGCD = true,
 			},
@@ -308,8 +306,7 @@ function iCD:SHAMAN(specID)
 				order = 5,
 				range = true,
 				cost = true,
-				stack = select(4, GetTalentInfo(2, 1, 1)),
-				charges = select(4, GetTalentInfo(2, 1, 1)),
+				stack = true,
 				glow = true,
 				glowSound = true,
 				showTimeAfterCast = true,
@@ -325,8 +322,7 @@ function iCD:SHAMAN(specID)
 				order = 2,
 				range = true,
 				cost = true,
-				charges = select(4, GetTalentInfo(2, 1, 1)),
-				stack = select(4, GetTalentInfo(2, 1, 1)),
+				stack = true,
 				showTimeAfterCast = true,
 			},
 			[73685] = { -- Unleash Life
@@ -370,8 +366,7 @@ function iCD:SHAMAN(specID)
 				-- Healing Stream Totem
 				order = 7,
 				range = true,
-				charges =  select(4, GetTalentInfo(2, 1, 1)),
-				stack = select(4, GetTalentInfo(2, 1, 1)),
+				stack = true,
 				showFunc = function()
 					return not select(4, GetTalentInfo(6, 3, 1))
 				end,
@@ -380,8 +375,7 @@ function iCD:SHAMAN(specID)
 			[157153] = { -- Cloudburst Totem
 				order = 7,
 				range = true,
-				charges =  select(4, GetTalentInfo(2, 1, 1)),
-				stack = select(4, GetTalentInfo(2, 1, 1)),
+				stack = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 3, 1))
 				end,

@@ -7,7 +7,6 @@ stack = true,
 glow = true,
 glowSound = true,
 stackFunc = function() return GetSpellCount(228477) end,
-charges = true,
 showFunc = function()
 	return select(4, GetTalentInfo(5, 1, 1))
 end,
@@ -31,14 +30,40 @@ function iCD:MONK(specID)
 	temp.spec = {}
 	temp.all = {}
 	temp.all.row1 = {
-
+		[310454] = { -- Weapons of Order
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			range = true,
+			covenant = iCD.covenants.KYRIAN,
+			stack = true,
+			stackFunc = function()
+				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Weapons of Order')
+				if expirationTime then
+					local dura = expirationTime - GetTime()
+					if dura > 5 then
+						--return string.format('%.0f', dura)
+						return dura, '%.0f'
+					else
+						return dura, '|cffff1a1a%.1f'
+					end
+				else
+					return ''
+				end
+			end,
+		},
 	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
 	temp.all.row4 = {}
 	temp.all.row5 = {}
 	temp.all.buffsC = {}
-	temp.all.buffsI = {}
+	temp.all.buffsI = {
+		[312106] = { -- Weapons of Order
+			covenant = iCD.covenants.KYRIAN,
+			stack = true,
+			debuff = true,
+		},
+	}
 	local t = temp.spec
 	t.row1 = {}
 	t.row2 = {}
@@ -87,14 +112,13 @@ function iCD:MONK(specID)
 				range = true,
 				cost = true,
 				showTimeAfterGCD = true,
-				charges = IsEquippedItem(151788),
-				stack = IsEquippedItem(151788),
+				stack = true,
 			},
 			[205523] = { -- Blackout Kick
 				order = 4,
 				range = true,
 				customRangeSpell = 'Tiger Palm',
-				stack = select(4, GetTalentInfo(7, 3, 1)),
+				stack = true,
 				stackFunc = select(4, GetTalentInfo(7, 3, 1)) and function()
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Blackout Combo')
 					if expirationTime then
@@ -111,21 +135,16 @@ function iCD:MONK(specID)
 				glow = true,
 				glowSound = true,
 				stackFunc = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Breath of Fire')
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff(nil,'Breath of Fire')
 					if expirationTime then
 						local dura = expirationTime - GetTime()
-						if dura > 5 then
-							--return string.format('%.0f', dura)
-							return dura, '%.0f'
-						else
-							return dura, '|cffff1a1a%.1f'
-						end
+						return dura, '%.0f'
 					else
 						return ''
 					end
 				end,
 				showTimeAfterGCD = true,
-				level = 29,
+				--level = 29,
 			},
 			[116847] = { -- Rushing Jade Wind
 				order = 8,
@@ -162,9 +181,6 @@ function iCD:MONK(specID)
 			},
 		}
 		t.row2 = {
-			[322507] = { -- Celestial Brew
-				order = 1,
-			},
 			[325153] = { -- Exploding Keg
 				order = 2,
 				showFunc = function()
@@ -174,7 +190,6 @@ function iCD:MONK(specID)
 			[122281] = { -- Healing Elixir
 				order = 3,
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(5, 2, 1))
@@ -191,40 +206,61 @@ function iCD:MONK(specID)
 				order = 6,
 				range = true,
 			},
-			[115203] = { -- Fortifying Brew
-				order = 8,
-				ignoreGCD = true,
-				level = 55,
-			},
 			[115176] = { -- Zen Meditation
 				order = 10,
 				ignoreGCD = true,
-				level = 65,
+				--level = 65,
 			},
+			[115203] = { -- Fortifying Brew
+			order = 8,
+				ignoreGCD = true,
+		},
 
 		}
 		t.row3 = {
 			[322101] = { -- Expel Harm
-				order = 3,
+				order = 10,
 				stack = true,
 				stackFunc = function()
-					return GetSpellCount(115072)
+					return GetSpellCount(322101)
 				end,
 				cost = true,
-				level = 50,
+				showTimeAfterGCD = true,
+				--level = 50,
 			},
 			[119582] = { -- Purifying Brew
-				order = 2,
+				order = 5,
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 			},
 			[115399] = { --Black Ox Brew
-				order = 1,
+				order = 3,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(3, 3, 1))
 				end,
+			},
+			[322507] = { -- Celestial Brew
+				order = 2,
+				showTimeAfterGCD = true,
+			},
+			[325092] = { -- Purified Chi
+				order = 1,
+				stack = true,
+				stackFunc = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Purified Chi')
+					return count or ""
+				end,
+				customText = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Purified Chi')
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						return dura, '%.0f'
+					else
+						return ''
+					end
+				end,
+				icon = 645193,
 			},
 		}
 		t.row4 = {
@@ -246,7 +282,6 @@ function iCD:MONK(specID)
 			[119996] = {}, -- Transcendence: Transfer
 			[115008] = { -- Chi Torpedo
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
@@ -254,7 +289,6 @@ function iCD:MONK(specID)
 			},
 			[109132] = { -- Roll
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return not select(4, GetTalentInfo(2, 2, 1))
@@ -265,6 +299,8 @@ function iCD:MONK(specID)
 					return  select(4, GetTalentInfo(2, 3, 1))
 				end,
 			},
+			[322109] = {}, -- Touch of Death
+			[324312] = {}, -- Clash
 		}
 		t.row5 = {
 			[120954] = {}, -- Fortifying Brew
@@ -377,7 +413,6 @@ function iCD:MONK(specID)
 			[137639] = { -- Storm, Earth, and Fire
 				order = 2,
 				stack = true,
-				charges = true,
 			},
 			[115080] = { -- Touch of Death
 				order = 3,
@@ -401,7 +436,6 @@ function iCD:MONK(specID)
 			[119996] = {}, -- Transcendence: Transfer
 			[115008] = { -- Chi Torpedo
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
@@ -409,7 +443,6 @@ function iCD:MONK(specID)
 			},
 			[109132] = { -- Roll
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return not select(4, GetTalentInfo(2, 2, 1))
@@ -524,7 +557,6 @@ function iCD:MONK(specID)
 			[122281] = { -- Healing Elixir
 				order = 4,
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(5, 1, 1))
@@ -566,7 +598,6 @@ function iCD:MONK(specID)
 			[115151] = { -- Renewing Mist
 				order = 4,
 				showTimeAfterCast = true,
-				charges = true,
 				stack = true,
 			},
 		}
@@ -593,7 +624,6 @@ function iCD:MONK(specID)
 			[119996] = {}, -- Transcendence: Transfer
 			[115008] = { -- Chi Torpedo
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
@@ -601,7 +631,6 @@ function iCD:MONK(specID)
 			},
 			[109132] = { -- Roll
 				stack = true,
-				charges = true,
 				ignoreGCD = true,
 				showFunc = function()
 					return not select(4, GetTalentInfo(2, 2, 1))
@@ -629,7 +658,7 @@ function iCD:MONK(specID)
 				showFunc = function() return iCD:Essences(32, true) end,
 			},
 			[116680] = { -- Thunder Focus Tea
-				stack = select(4, GetTalentInfo(7, 2, 1))
+				stack = true,
 			},
 			[197206]  = {} -- Uplifting Trance
 		}

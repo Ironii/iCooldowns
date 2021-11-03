@@ -99,8 +99,7 @@ function iCD:DEMONHUNTER(specID)
 			[185123] = { -- Throw Glaive
 				order = 10,
 				range = true,
-				stack = select(4, GetTalentInfo(6, 2, 1)),
-				charges = select(4, GetTalentInfo(6, 2, 1)),
+				stack = true,
 				showTimeAfterGCD = true,
 			},
 			[211881] = { -- Fel Eruption
@@ -129,7 +128,6 @@ function iCD:DEMONHUNTER(specID)
 			},
 			[195072] = { -- Fel Rush
 				order = 8,
-				charges = true,
 				stack = true,
 			},
 			[198589] = { -- Blur
@@ -201,7 +199,6 @@ function iCD:DEMONHUNTER(specID)
 				order = 1,
 				range = true,
 				customRangeSpell = 'Shear',
-				charges = true,
 				stack = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(4, 3, 1))
@@ -252,7 +249,6 @@ function iCD:DEMONHUNTER(specID)
 				[189110] = { -- Infernal Strike
 					order = 1,
 					stack = true,
-					charges = true,
 					ignoreGCD = true,
 				},
 			[263648] = { -- Soul Barrier
@@ -287,7 +283,6 @@ function iCD:DEMONHUNTER(specID)
 				order = 2,
 				stack = true,
 				ignoreGCD = true,
-				charges = true,
 				AM = function()
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Demon Spikes')
 					if expirationTime then

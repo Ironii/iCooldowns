@@ -377,7 +377,6 @@ function iCD:WARLOCK(specID)
 						order = 5,
 						range = true,
 						stack = true,
-						charges = true,
 						showTimeAfterCast = true,
 					},
 					[80240] = { -- Havoc

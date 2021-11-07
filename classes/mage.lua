@@ -3,7 +3,14 @@ function iCD:MAGE(specID)
 	local temp = {}
 	temp.spec = {}
 	temp.all = {}
-	temp.all.row1 = {}
+	temp.all.row1 = {
+		[314791] = { -- Shifting Power
+			order = 1e4,	
+			covenant = iCD.covenants.NIGHTFAE,
+			cost = true,
+			showTimeAfterCast = true,
+		},
+	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
 	temp.all.row4 = {}
@@ -340,6 +347,7 @@ function iCD:MAGE(specID)
 			[120] = {  -- Cone of Cold
 				order = 20,
 				cost = true,
+				showTimeAfterCast = true,
 			},
 		}
 		t.row2 = {

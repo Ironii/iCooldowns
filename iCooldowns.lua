@@ -2093,6 +2093,10 @@ end
 function addon:SOULBIND_PATH_CHANGED()
 	iCD:UpdateSkills()
 end
+function addon:COVENANT_CHOSEN(covenantID)
+	currentCovenant = C_Covenants.GetActiveCovenantID()
+	addon:PLAYER_SPECIALIZATION_CHANGED()
+end
 --------------------
 ---NAMEPLATE-RANGE--
 --------------------

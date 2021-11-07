@@ -36,6 +36,11 @@ function iCD:WARRIOR(specID)
 			covenant = iCD.covenants.NECROLORD,
 			showTimeAfterGCD = true,
 		},
+		[325886] = { -- Ancient Aftershock
+			order = 9999, -- Always last
+			covenant = iCD.covenants.NIGHTFAE,
+			showTimeAfterGCD = true,
+		},
 	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
@@ -48,6 +53,9 @@ function iCD:WARRIOR(specID)
 		[5246] = {}, -- Intimidating Shout
 		[6673] = {}, -- Battle Shout
 		[100] = { -- Charge
+			stack = true,
+		},
+		[6544] = { -- Heroic Leap
 			stack = true,
 		},
 	}
@@ -256,9 +264,6 @@ function iCD:WARRIOR(specID)
 		t.row4 = {
 			[18499] = {}, -- Berserker Rage
 			[355] = {}, -- Taunt
-			[6544] = { -- Heroic Leap
-				stack = true,
-			},
 			[190456] = {}, -- Ignore Pain
 		}
 		t.row5 = {
@@ -419,7 +424,6 @@ function iCD:WARRIOR(specID)
 			[355] = { -- Taunt
 				ignoreGCD = true,
 			},
-			[6544] = {}, -- Heroic Leap
 			[57755] = {}, -- Heroic Throw
 			[5246] = {}, -- Intimidating Shout
 			[190456] = {}, -- Ignore Pain
@@ -631,10 +635,6 @@ function iCD:WARRIOR(specID)
 			},
 			[3411] = { -- Intervene
 				level = 43,
-			},
-			[6544] = { -- Heroic Leap
-				stack = true,
-				level = 26,
 			},
 			[64382] = {}, -- Shattering Throw
 		}

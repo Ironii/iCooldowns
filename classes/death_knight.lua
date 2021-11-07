@@ -45,9 +45,8 @@ function iCD:DEATHKNIGHT(specID)
 					end
 				end,
 				level = 3,
-				--showTimeAfterGCD = true,
 			},
-			[311648] = {
+		[311648] = { -- Swarming Mist
 				order = 1e4,
 				cost = true,
 				covenant = iCD.covenants.VENTHYR,
@@ -84,6 +83,26 @@ function iCD:DEATHKNIGHT(specID)
 					end
 				end
 			},
+		[315443] = { -- Abomination Limb
+			order = 1e4,
+			cost = true,
+			covenant = iCD.covenants.NECROLORD,
+			stack = true,
+			stackFunc = function()
+				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Abomination Limb')
+				if expirationTime then
+					local dura = expirationTime - GetTime()
+					if dura > 5 then
+						return dura,'%.0f'
+					else
+						return dura, '|cffff1a1a%.1f'
+					end
+				else
+					return ''
+				end
+			end,
+			showTimeAfterGCD = true,
+		},
 	}
 	temp.all.row2 = {
 		[48707] = { -- Anti-Magic Shell

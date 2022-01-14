@@ -14,6 +14,11 @@ function iCD:PRIEST(specID)
 			showTimeAfterCast = true,
 			covenant = iCD.covenants.KYRIAN
 		},
+		[323673] = { -- Mindgames
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.VENTHYR
+		},
 	}
 	temp.all.row2 = {
 		[19236] = { -- Desperate Prayer
@@ -54,6 +59,14 @@ function iCD:PRIEST(specID)
 			end,
 		}
 		t.row1 = {
+			[110744] = { -- Divine Star
+				order = 17,
+				cost = true,
+				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 2, 1))
+				end,
+			},
 			[47540] = { -- Penance
 				order = 3,
 				cost = true,
@@ -61,7 +74,7 @@ function iCD:PRIEST(specID)
 				showTimeAfterCast = true,
 			},
 			[129250] = { -- Power Word: Solace
-				order = 1,
+				order = 6,
 				range = true,
 				showTimeAfterCast = true,
 				showFunc = function()
@@ -75,7 +88,7 @@ function iCD:PRIEST(specID)
 				showTimeAfterCast = true,
 			},
 			[214621] = { -- Schism
-				order = 6,
+				order = 7,
 				range = true,
 				cost = true,
 				showTimeAfterCast = true,
@@ -84,7 +97,7 @@ function iCD:PRIEST(specID)
 				end,
 			},
 			[194509] = { -- Power Word: Radiance
-				order = 7,
+				order = 8,
 				cost = true,
 				stack = true,
 			},
@@ -168,6 +181,12 @@ function iCD:PRIEST(specID)
 				end,
 				stack = true,
 			},
+			[204263] = { -- Shining Force
+				showFunc = function()
+					return select(4, GetTalentInfo(4, 3, 1))
+				end,
+			},
+			[73325] = {}, -- Leap of Faith
 		}
 		t.buffsC = {
 		}
@@ -420,7 +439,23 @@ function iCD:PRIEST(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
-
+			[263165] = { -- Void Torrent
+				order = 8,
+				range = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 3, 1))
+				end,
+				showTimeAfterGCD = true,
+				range = true,
+			},
+			[319952] = { -- Surrender to Maddness
+				order = 20,
+				range = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 3, 1))
+				end,
+				showTimeAfterGCD = true,
+			},
 		}
 		t.row2 = {
 			[228260] = { -- Void Eruption

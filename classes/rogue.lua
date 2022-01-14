@@ -6,7 +6,9 @@ function iCD:ROGUE(specID)
 	temp.all.row1 = {}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
-	temp.all.row4 = {}
+	temp.all.row4 = {
+		[5938] = {}, -- Shiv
+	}
 	temp.all.row5 = {}
 	temp.all.buffsC = {}
 	temp.all.buffsI = {}
@@ -43,14 +45,6 @@ function iCD:ROGUE(specID)
 				range = true,
 				showTimeAfterGCD = true,
 			},
-			[245388] = { -- Toxic Blade
-				order = 7,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 2, 1))
-				end,
-				range = true,
-				showTimeAfterGCD = true,
-			},
 			[137619] = { -- Marked for Death
 				order = 10,
 				showFunc = function()
@@ -84,15 +78,16 @@ function iCD:ROGUE(specID)
 		t.row3 = {
 			[121411] = { -- Crimson Tempest
 				order = 2,
-				customText = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Crimson Tempest')
+				range = true,
+				cost = true,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Crimson Tempest', true)
 					if expirationTime then
-						if duration == 0 then return "+" end
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -104,15 +99,16 @@ function iCD:ROGUE(specID)
 			},
 			[703] = { -- Garrote
 				order = 3,
-				customText = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Garrote')
+				range = true,
+				cost = true,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Garrote', true)
 					if expirationTime then
-						if duration == 0 then return "+" end
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -121,15 +117,16 @@ function iCD:ROGUE(specID)
 			},
 		[1943] = { -- Rupture
 			order = 4,
-			customText = function()
-				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Rupture')
+			range = true,
+			cost = true,
+			customText = function(data, gcdInfo)
+				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Rupture', true)
 				if expirationTime then
-					if duration == 0 then return "+" end
 					local dura = expirationTime - GetTime()
 					if dura > 5 then
-						return dura, '%.0f'
+						return dura-gcdInfo.left, '%.0f'
 					else
-						return dura, '|cffff1a1a%.1f'
+						return dura-gcdInfo.left, '|cffff1a1a%.1f'
 					end
 				else
 					return ''
@@ -139,13 +136,16 @@ function iCD:ROGUE(specID)
 		}
 		t.row4 = {
 			[2094] = {}, -- Blind
-			[2983] = {}, -- Sprint
+			[2983] = { -- Sprint
+				ignoreGCD = true,
+			},
 			[408] = {}, -- Kidney Shot
 			[36554] = { -- Shadow Step
 				ignoreGCD = true,
 			},
 			[5277] = {}, -- Evasion
 			[1725] = {}, -- Distract
+			[1966] = {}, -- Feint
 		}
 		t.buffsI = {
 			[79140] = { -- Vendetta
@@ -191,9 +191,22 @@ function iCD:ROGUE(specID)
 				range = true,
 				glow = true,
 				glowSound = true,
-
+				stack = true,
+				stackFunc = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Opportunity')
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura,'%.0f'
+						else
+							return dura, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+			end,
 			},
-			[199804] = { -- Between the Eyes
+			[315341] = { -- Between the Eyes
 				order = 3,
 				cost = true,
 				range = true,
@@ -211,6 +224,10 @@ function iCD:ROGUE(specID)
 			},
 		}
 		t.row2 = {
+			[315508] = { -- Roll the Bones
+				cost = true,
+				order = 1,
+			},
 			[13750] = { --Adrenaline Rush
 				order = 3,
 			},
@@ -225,7 +242,7 @@ function iCD:ROGUE(specID)
 			[185311] = { -- Crimson Vial
 				order = 7,
 			},
-			[199754] = { -- Riposte
+			[5277] = { -- Evasion
 				order = 12,
 				ignoreGCD = true,
 			},
@@ -241,8 +258,7 @@ function iCD:ROGUE(specID)
 		}
 		t.buffsI = {
 			[13877] = {}, -- Blade Flurry
-			[5171] = {}, -- Slice and dice
-
+			[315496] = {}, -- Slice and dice
 			[193359] = {  -- True Bearing
 				stack = "-CD",
 			},
@@ -274,7 +290,7 @@ function iCD:ROGUE(specID)
 		}
 	elseif specID == 261 then --Sublety
 		iCD.outOfRangeSpells = {
-			main = 'Backstab',
+			main = 'Eviscerate',
 			range = 'Shuriken Toss',
 		}
 		t.power = {
@@ -294,21 +310,24 @@ function iCD:ROGUE(specID)
 			[137619] = { -- Marked for Death
 				order = 2,
 				showFunc = function()
-					return select(4, GetTalentInfo(7, 2, 1))
+					return select(4, GetTalentInfo(3, 3, 1))
 				end,
 				range = true,
+				showTimeAfterGCD = true,
 			},
-			[152150] = { -- Death from Above
+			[277925] = { -- Shuriken Tornado
 				order = 2,
 				showFunc = function()
 					return select(4, GetTalentInfo(7, 3, 1))
 				end,
-				range = true,
+				cost = true,
+				showTimeAfterGCD = true,
 			},
 		}
 		t.row2 = {
 			[121471] = { -- Shadow Blades
 				order = 5,
+				showTimeAfterGCD = true,
 			},
 			[185313] = { -- Shadow Dance
 				stack = true,
@@ -327,11 +346,45 @@ function iCD:ROGUE(specID)
 			},
 			[185311] = { -- Crimson Vial
 				order = 10,
-				ignoreGCD = true,
 				cost = true,
 			},
 
 
+		}
+		t.row3 = {
+			[315496] = { -- Slice and Dice
+				order = 2,
+				cost = true,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Slice and Dice')
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
+			},
+			[1943] = { -- Rupture
+				order = 1,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Rupture', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
+			},
 		}
 		t.row4 = {
 			[2094] = {}, -- Blind
@@ -340,6 +393,7 @@ function iCD:ROGUE(specID)
 			[408] = {}, -- Kidney Shot
 			[31224] = {}, -- Cloak of Shadows
 			[5277] = {}, -- Evasion
+			[5938] = {}, -- Shiv
 		}
 		t.buffsI = {
 			[185422] = {}, -- Shadow Dance

@@ -227,6 +227,13 @@ function iCD:WARRIOR(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
+			[202168] = { -- Impending Victory
+				order = 50,
+				showTimeAfterGCD = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(2, 2, 1))
+				end,
+			},
 		}
 		t.row2 = {
 			[227847] = { -- Bladestorm
@@ -260,6 +267,43 @@ function iCD:WARRIOR(specID)
 			},
 		}
 		t.row3 = {
+			[772] = { -- Rend
+				order = 1,
+				showFunc = function()
+					return select(4, GetTalentInfo(3,3,1))
+				end,
+				cost = true,
+				range = true,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Rend', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
+			},
+			[262111] = { -- Deep Wounds
+				order = 1,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Deep Wounds', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
+			},
 		}
 		t.row4 = {
 			[18499] = {}, -- Berserker Rage
@@ -276,22 +320,25 @@ function iCD:WARRIOR(specID)
 			[208086] = { -- Colossus Smash
 				debuff = true,
 			},
+			[184362] = {}, -- Enrage
+			--[[
 			[262115] = { -- Deep Wounds
 				debuff = true,
 			},
-			[184362] = {}, -- Enrage
 			[772] = { -- Rend
 				debuff = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(3, 3, 1))
 				end,
 			},
+			--]]
 			[260708] = {}, -- Sweeping Strikes
 			[7384] = { -- Overpower
 				stack = true,
 			},
 			[32216] = {}, -- Victory Rush
 			[278826] = {}, -- Crushing Assault
+			[346574] = {}, -- Merciless Bonegrinder
 		}
 		t.buffsC = {
 			[18499] = {}, -- Berserker Rage

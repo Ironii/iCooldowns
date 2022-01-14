@@ -180,7 +180,7 @@ function iCD:DEATHKNIGHT(specID)
 		}
 		t.row1 = {
 			[206931] = { -- Blooddrinker
-				order = 1,
+				order = 5,
 				showTimeAfterGCD = true,
 				range = true,
 				customText = function()
@@ -202,7 +202,7 @@ function iCD:DEATHKNIGHT(specID)
 				end,
 			},
 			[50842] = { -- Blood Boil
-				order = 2,
+				order = 10,
 				row = 1,
 				stack = true,
 				showTimeAfterGCD = true,
@@ -221,6 +221,14 @@ function iCD:DEATHKNIGHT(specID)
 					return select(4, GetTalentInfo(7, 3, 1))
 				end,
 				showTimeAfterGCD = true,
+			},
+			[221699] = { -- Blood Tap
+				order = 1e4,
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 3, 1))
+				end,
+				ignoreGCD = true,
+				stack = true,
 			},
 			[46585] = {  -- Raise Dead
 				order = 1e5,
@@ -415,7 +423,6 @@ function iCD:DEATHKNIGHT(specID)
 			[196770] = { -- Remorseless Winter
 				order = 3,
 				cost = true,
-				level = 19,
 				stack = true,
 				stackFunc = function()
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Remorseless Winter')
@@ -431,34 +438,45 @@ function iCD:DEATHKNIGHT(specID)
 						return ''
 					end
 				end,
+				showTimeAfterGCD = true,
 			},
+			[152279] = { -- Breath of Sindragosa
+				order = 20,
+				cost = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 3, 1))
+				end,
+				showTimeAfterGCD = true,
+			},
+			[279302] = { -- Frostwyrm's Fury
+				order = 25,
+				showTimeAfterGCD = true,
+			},
+			[46585]  = { -- Raise Dead
+				order = 40,
+				showTimeAfterGCD = true,
+			}
 		}
 		t.row2 = {
 			[51271] = { -- Pillar of Frost
 				order = 3,
 				level = 29,
+				ignoreGCD = true,
 			},
 			[47568] = { -- Empowered Rune Weapon
 				order = 6,
 				level = 48,
-			},
-			[207256] = { -- Obliteration
-				order = 4,
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 2, 1))
-				end,
-			},
-			[152279] = { -- Breath of Sindragosa
-				order = 4,
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 3, 1))
-				end,
+				showTimeAfterGCD = true,
 			},
 		}
 		t.row4 = {
 			[221562] = {}, -- Asphyxiate
 			[212552] = {}, -- Wraith Walk
-
+				[207167] = { -- Blinding Sleet
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 3, 1))
+				end,
+			},
 		}
 		t.row5 = {
 			[81256] = {}, -- Dancing Rune Weapon
@@ -548,7 +566,7 @@ function iCD:DEATHKNIGHT(specID)
 				},
 				[47481] = {}, -- Gnaw (pet)
 				[47482] = {}, -- Leap (pet)
-				[46585] = {},  -- Raise Dead
+				[46584] = {},  -- Raise Dead
 			}
 			t.buffsC = {
 				[274373] = { -- Festermight (trait)

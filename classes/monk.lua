@@ -373,11 +373,25 @@ function iCD:MONK(specID)
 				end,
 			},
 			[116847] = { -- Rushing Jade Wind
-				order = 10,
+				order = 9,
 				cost = true,
 				showTimeAfterGCD = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 2, 1))
+				end,
+			},
+			[322101] = { -- Expel Harm
+				order = 10,
+				range = true,
+				cost = true,
+				showTimeAfterGCD = true,
+			},
+			[115098] = { -- Chi Wave
+				order = 11,
+				cost = true,
+				showTimeAfterGCD = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(1, 2, 1))
 				end,
 			},
 			[123986] = { -- Chi Burst
@@ -473,8 +487,10 @@ function iCD:MONK(specID)
 			}
 		}
 		t.buffsI = {
-			[286587] = { -- Dance of Chi-Ji
-				azerite = 391,
+			[325202] = { -- Dance of Chi-Ji
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 3, 1))
+				end,
 				stack = "+SCK",
 			},
 			[115080] = { -- Touch of Death
@@ -534,14 +550,13 @@ function iCD:MONK(specID)
 				order = 14,
 				showTimeAfterCast = true,
 			},
-
+			[322101] = { -- Expel Harm
+				order = 20,
+				showTimeAfterCast = true,
+			},
 
 		}
 		t.row2 = {
-			[216113] = { -- Way of the Crane
-				order = 1,
-				showFunc = function() return iCD:Essences(32, true) end,
-			},
 			[116680] = { -- Thunder Focus Tea
 				order = 2,
 				ignoreGCD = true,
@@ -581,10 +596,16 @@ function iCD:MONK(specID)
 				order = 5,
 				ignoreGCD = true,
 			},
-			[198664] = { -- Invoke Chi-Ji the Red Crane
+			[325197] = { -- Invoke Chi-Ji the Red Crane
 				order = 7,
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 3, 1))
+				end,
+			},
+			[322118] = { -- Invoke Yu'lon, the Jade Serpent
+				order = 7,
+				showFunc = function()
+					return not select(4, GetTalentInfo(6, 3, 1))
 				end,
 			},
 			[115310] = { -- Revival
@@ -622,6 +643,7 @@ function iCD:MONK(specID)
 			[115546] = {}, -- Provoke
 			[101643] = {}, -- Transcendence
 			[119996] = {}, -- Transcendence: Transfer
+			[119381] = {}, -- Leg Sweep
 			[115008] = { -- Chi Torpedo
 				stack = true,
 				ignoreGCD = true,

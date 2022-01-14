@@ -176,15 +176,17 @@ function iCD:SHAMAN(specID)
 		}
 		t.power = {
 			func = function()
-				return UnitPower("player", 11)
+				return math.floor((UnitPower("player", 0) / UnitPowerMax("player", 0)) * 100)
 			end
 		}
 		t.row1 = {
-			[193786] = { -- Rockbiter
+			[60103] = { -- Lava Lash
 				order = 3,
 				range = true,
 				stack = true,
+				cost = true,
 				showTimeAfterGCD = true,
+				range = true,
 			},
 			[17364] = { -- Stormstrike
 				order = 5,
@@ -192,12 +194,9 @@ function iCD:SHAMAN(specID)
 				stack = true,
 				glow = true,
 				glowSound = true,
-				stackFunc = function()
-					local c = GetSpellCount(17364)
-					return c > 0 and c or ""
-				end,
 				cost = true,
 				showTimeAfterGCD = true,
+				range = true,
 			},
 			[188089] = { -- Earthen Spike
 				order = 7,
@@ -205,36 +204,31 @@ function iCD:SHAMAN(specID)
 				cost = true,
 				showTimeAfterGCD = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(7, 3, 1))
+					return select(4, GetTalentInfo(7, 2, 1))
 				end
-			},
-			[193796] = { -- Flametongue
-				order = 10,
-				range = true,
-				showTimeAfterGCD = true,
-				stack = true,
-				stackFunc = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', "Flametongue", nil, 'player')
-					if expirationTime then
-						local dura = expirationTime - GetTime()
-						return dura, '%.0f'
-					else
-						return ''
-					end
-				end,
 			},
 			[187874] = { -- Crash Lightning
 				order = 10,
 				range = true,
 				cost = true,
+				range = true,
+				stack = true,
 				showTimeAfterGCD = true,
+			},
+			[188389] = { -- Flame Shock
+				order = 25,
+				range = true,
+				showTimeAfterGCD = true,
+			},
+			[197214] = { -- Sundering
+				order = 30,
+				showTimeAfterGCD = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 3, 1))
+				end
 			},
 		}
 		t.row2 = {
-			[204945] = { -- Doom Winds
-				order = 3,
-				ignoreGCD = true,
-			},
 			[51533] = { -- Feral Spirits
 				order = 5,
 				showTimeAfterGCD = true,
@@ -243,6 +237,15 @@ function iCD:SHAMAN(specID)
 				order = 7,
 				ignoreGCD = true
 			}
+		}
+		t.row3 = {
+			[344179] = { -- Maelstorm Weapon
+				order = 1,
+				customText = function()                                                         
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff("player","Maelstrom Weapon")
+					return count or ""
+				end
+			},
 		}
 		t.row4 = {
 			[196884] = {-- Feral Lunge
@@ -258,18 +261,9 @@ function iCD:SHAMAN(specID)
 			[2825] = {}, -- Bloodlust
 			[51886] = {}, -- Cleanse Spirit
 			[2484] = {}, -- Earthbind Totem
-			[192063] = {-- Gust of Wind
-				showFunc = function()
-					return select(4, GetTalentInfo(2, 1, 1))
-				end
-			},
 			[51514] = {}, -- Hex
-			[192058] = { -- Lightning Surge Totem
-				showFunc = function()
-					return select(4, GetTalentInfo(3, 1, 1))
-				end
-			},
 			[58875] = {}, --Spirit Walk
+			[192058] = {}, -- Capacitor Totem
 		}
 		t.buffsC = {
 			[114051] = { -- Ascendance
@@ -281,13 +275,10 @@ function iCD:SHAMAN(specID)
 			[58875] = {} -- Spirit Walk
 		}
 		t.buffsI = {
-			[215864] = { -- Rainfall
-				showFunc = function()
-					return select(4, GetTalentInfo(2, 1, 1))
-				end
-			},
-			[204945] = {}, -- Doom Winds (artifact)
 			[187878] = {}, -- Crash Lightning (cleave)
+			[188389] = { -- Flame Shock
+				debuff = true,
+			}
 		}
 	elseif specID == 264 then -- Restoration
 		iCD.customSpellTimers[157153] = 0

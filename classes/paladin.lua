@@ -1,6 +1,12 @@
 local _, iCD = ...
 function iCD:PALADIN(specID)
 	iCD.customSpellTimers[26573] = 0
+	local seasonStacks = {
+		[328282] = "sp",
+		[328620] = "su",
+		[328622] = "au",
+		[328281] = "wi",
+	}
 	local temp = {}
 	temp.spec = {}
 	temp.all = {}
@@ -30,7 +36,40 @@ function iCD:PALADIN(specID)
 			covenant = iCD.covenants.KYRIAN,
 			range = true,
 			showTimeAfterGCD = true,
-		}
+		},
+		[328204] = { -- Vanquisher's Hammer
+			order = 99999, -- Always last
+			covenant = iCD.covenants.NECROLORD,
+			range = true,
+			showTimeAfterGCD = true,
+			stack = true,
+			stackFunc = function(data, gcdInfo)
+				--328204
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', "Vanquisher's Hammer", true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+			end
+		},
+		[328620] = { -- Blessing of Seasons
+			order = 99999, -- Always last
+			covenant = iCD.covenants.NIGHTFAE,
+			range = true,
+			showTimeAfterGCD = true,
+			stack = true,
+			stackFunc = function()
+				local currentSeason = FindSpellOverrideByID(328620)
+				return currentSeason and seasonStacks[currentSeason] or "??"
+			end,
+			icon = 3636846,
+		},
 	}
 	temp.all.row2 = {
 		[6940] = { -- Blessing of Sacrifice
@@ -249,7 +288,7 @@ function iCD:PALADIN(specID)
 			[31842] = {}, -- Avenging Wrath
 			[105809] = { -- Holy Avenger
 				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
+					return select(4, GetTalentInfo(5, 2, 1))
 				end
 			},
 			[294027] = { -- Critical Chance
@@ -268,7 +307,8 @@ function iCD:PALADIN(specID)
 			},
 			[340459] = { -- Maraad's Dying Breath
 				stack = true,
-			}
+			},
+
 		}
 		t.buffsC = {
 		}
@@ -523,6 +563,21 @@ function iCD:PALADIN(specID)
 			[26573] = { -- Consecration
 				order = 15,
 				showTimeAfterGCD = true,
+				stack = true,
+				stackFunc = function(data, gcdInfo)
+					if iCD.customSpellTimers[26573] then
+						local dura =  iCD.customSpellTimers[26573] - GetTime()
+						if dura <= 0 then
+							return ''
+						elseif dura > 5 then
+							return dura,'%.0f'
+						else
+							return dura, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
 			},
 		}
 		t.row2 = {

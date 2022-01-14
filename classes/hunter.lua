@@ -175,17 +175,13 @@ function iCD:HUNTER(specID)
 			[185358] = { -- Arcane Shot
 				order = 2,
 				range = true,
+				cost = true,
 				stack = true,
 				glow = true,
 				glowSound = 'text1',
 				stackFunc = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Marking Targets')
-					if expirationTime then
-						local dura = expirationTime - GetTime()
-						return dura, '%.0f'
-					else
-						return ''
-					end
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Precise Shots')
+					return count or ""
 				end
 			},
 			[19434] = { -- Aimed Shot
@@ -195,25 +191,40 @@ function iCD:HUNTER(specID)
 				glow = true,
 				glowSound = true,
 				stack = true,
-				stackFunc = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Lock and Load')
-					if count then
-						return count
-					else
-						return ''
-					end
-				end,
+				showTimeAfterGCD = true,
 			},
-			[212431] = { -- Explosive Shot
-				order = 5,
+			[120360] = { -- Barrage
+				order = 10,
+				cost = true,
+				showTimeAfterGCD = true,
 				range = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(4, 1, 1))
+					return select(4, GetTalentInfo(2, 2, 1))
 				end,
 				cost = true,
 			},
-			[194599] = { -- Black Arrow
+			[53351] = { -- Kill Shot
+				order = 5,
+				range = true,
+				cost = true,
+				stack = true,
+				customCost = function()
+					local isUsable = IsUsableSpell("Kill Shot")
+					return not isUsable
+				end,
+				glow = true,
+				glowSound = "text2",
+				showTimeAfterGCD = true,
+			},
+			[257044] = { -- Rapid Fire
+				order = 7,
+				range = true,
+				showTimeAfterGCD = true,
+			},
+			[120360] = { -- Barrage
 				order = 10,
+				cost = true,
+				showTimeAfterGCD = true,
 				range = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(2, 2, 1))
@@ -222,15 +233,25 @@ function iCD:HUNTER(specID)
 			},
 		}
 		t.row2 = {
+			[260402] = { -- Double Tap
+				order = 1,
+				cost = true,
+				showTimeAfterGCD = true,
+				range = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 3, 1))
+				end,
+				cost = true,
+			},
 			[131894] = { -- A Murder of Crows
 				order = 2,
 				range = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(6, 1, 1))
+					return select(4, GetTalentInfo(1, 3, 1))
 				end,
 				cost = true,
 			},
-			[193526] = { -- Trueshot
+			[288613] = { -- Trueshot
 				order = 3,
 				ignoreGCD = true,
 			},
@@ -238,18 +259,13 @@ function iCD:HUNTER(specID)
 				order = 10,
 				ignoreGCD = true,
 			},
-			[109304] = {
+			[109304] = { -- Exhilaration
 				order = 8,
-				ignoreGCD = true,
 			},
 		}
 		t.row4 = {
 			[186257] = {}, -- Aspect of the Cheetah
-			[109248] = { -- Binding Shot
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 1, 1))
-				end,
-			},
+			[109248] = {}, -- Binding Shot
 			[186387] = {}, -- Bursting Shot
 			[781] = {}, -- Disengage
 			[5384] = {}, -- Feign Death
@@ -257,16 +273,15 @@ function iCD:HUNTER(specID)
 			[34477] = {}, -- Misdirection
 			[187650] = {}, -- Freezing Trap
 			[187698] = {}, -- Tar Trap
-
-
+			[5116] = {}, -- Concussive Shot
 		}
 		t.buffsI = {
 		}
 		t.buffsC = {
 		}
-	elseif specID == 255 then
+	elseif specID == 255 then --Survival
 		iCD.outOfRangeSpells = {
-			main = 'Flanking Strike',
+			main = 'Raptor Strike',
 			range = 'Harpoon',
 		}
 		t.power = {
@@ -283,37 +298,42 @@ function iCD:HUNTER(specID)
 		}
 		-- Row 1
 		t.row1 = {
-			[203415] = { -- Fury of the Eeagle (artifact)
-				order = 1,
+			[259495] = { -- Wildfire Bomb
+				stack = true,
+				order = 10,
 				range = true,
+				showTimeAfterGCD = true,
 			},
-			[190928] = { -- Mongoose Bite
-				order = 2,
+			[259489] = { -- Kill Command
+				order = 15,
 				range = true,
 				stack = true,
 				glow = true,
 				glowSound = true,
+				showTimeAfterGCD = true,
 			},
-			[212436] = { -- Butchery
-				order = 4,
+			[187708] = { -- Carve
+				order = 20,
+				showTimeAfterGCD = true,
+				cost = true,
 				range = true,
-				stack = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 1, 1))
-				end,
 			},
-			[202800] = { -- Flanking Strike
-				order = 5,
+			[320976] = { -- Kill Shot
+				order = 30,
 				range = true,
 				cost = true,
+				customCost = function()
+					local isUsable = IsUsableSpell("Kill Shot")
+					return not isUsable
+				end,
+				showTimeAfterGCD = true,
+				glow = true,
 			},
 		}
 		t.row2 = {
-			[194407] = { -- Spitting Cobra
-				order = 1,
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 1, 1))
-				end,
+			[266779] = { -- Coordinated Assault
+				order = 3,
+				ignoreGCD = true,
 			},
 			[186289] = { -- Aspect of the Eagle
 				order = 5,
@@ -323,9 +343,28 @@ function iCD:HUNTER(specID)
 				order = 10,
 				ignoreGCD = true,
 			},
-			[109304] = {
+			[109304] = { -- Exhilaration
 				order = 8,
-				ignoreGCD = true,
+			},
+		}
+		t.row3 = {
+			[259491] = { -- Serpent Sting
+				order = 1,
+				cost = true,
+				range = true,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Serpent Sting', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
 			},
 		}
 		t.row4 = {
@@ -338,11 +377,11 @@ function iCD:HUNTER(specID)
 			[191433] = {}, -- Explosive Trap
 			[187698] = {}, -- Caltrops
 			[190925] = {}, -- Harpoon
+			[19577] = {}, -- Intimidation
+			[136] = {}, -- Mend Pet
 		}
 		t.buffsI = {
-			[185855] = { -- Lacerate
-				debuff = true,
-			}
+			[186289] = {}, -- Aspect of the Eagle
 		}
 		t.buffsC = {
 		}

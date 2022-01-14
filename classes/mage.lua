@@ -11,7 +11,11 @@ function iCD:MAGE(specID)
 			showTimeAfterCast = true,
 		},
 	}
-	temp.all.row2 = {}
+	temp.all.row2 = {
+		[55342] = { -- Mirror Image
+			order = 30,
+		},
+	}
 	temp.all.row3 = {}
 	temp.all.row4 = {}
 	temp.all.row5 = {
@@ -39,10 +43,6 @@ function iCD:MAGE(specID)
 			end,
 		}
 		t.row1 = {
-			[224968] = { -- Mark of Aluneth (artifact)
-				order = 2,
-				range = true,
-			},
 			[44425] = { -- Arcane Barrage
 				order = 3,
 				range = true,
@@ -50,6 +50,7 @@ function iCD:MAGE(specID)
 				stackFunc = function()
 					return UnitPower('player', 16)
 				end,
+				showTimeAfterGCD = true,
 			},
 			[5143] = { -- Arcane Missiles
 				order = 5,
@@ -66,9 +67,16 @@ function iCD:MAGE(specID)
 				order = 7,
 				cost = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(7, 3, 1))
+					return select(4, GetTalentInfo(6, 2, 1))
 				end,
+				showTimeAfterGCD = true,
 			},
+			[321507] = { -- Touch of the Magic
+				order = 10,
+				range = true,
+				cost = true,
+				showTimeAfterGCD = true,
+			}
 		}
 		t.row2 = {
 			[205025] = { -- Precense of Mind
@@ -78,13 +86,6 @@ function iCD:MAGE(specID)
 			[12042] = { -- Arcane Power
 				order = 3,
 				ignoreGCD = true,
-			},
-			[205032] = { -- Charged Up
-				order = 4,
-				ignoreGCD = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 2, 1))
-				end,
 			},
 			[12051] = { -- Evocation
 				order = 7,
@@ -162,9 +163,6 @@ function iCD:MAGE(specID)
 				cost = true,
 				stack = true,
 				order = 5,
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 3, 1))
-				end,
 			},
 			[108853] = { -- Fire Blast
 				range = true,
@@ -379,6 +377,10 @@ function iCD:MAGE(specID)
 					return select(4, GetTalentInfo(3, 3, 1))
 				end,
 			},
+			[108978] = { -- Alter Time
+				order = 20,
+				ignoreGCD = true,
+			},
 		}
 
 		t.row4 = { -- Blink
@@ -398,6 +400,9 @@ function iCD:MAGE(specID)
 			[66] = {}, -- Invisibility
 			[80353] = {}, -- Time Warp
 			[33395] = {}, -- Freeze (pet)
+		}
+		t.row5 = {
+			[45438] = {}, -- Ice Block
 		}
 		t.buffsC = {
 			[11426] = {}, -- Ice Barrier

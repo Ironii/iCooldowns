@@ -469,6 +469,13 @@ function iCD:GetGenerals(specID)
 			[10060] = { -- Power Infusion
 				stack = "+H"
 			},
+			[328282] = { -- Blessing of Seasons (spring)
+				stack = "hpr"
+			},
+			[328622] = { -- Blessing of Seasons (Autumn)
+				stack = "cdr"
+			},
+
 		}
 		t.buffsC = {
 			[356042] = { -- Soul Fragment (domination socket)
@@ -733,6 +740,8 @@ function iCD:GetGenerals(specID)
 				stack = true,
 				covenant = iCD.covenants.VENTHYR
 			},
+			[328620] = {}, -- Blessing of Seasons (Summer)
+			[328281] = {}, -- Blessing of Seasons (Winter)
 		}
 	return t
 end

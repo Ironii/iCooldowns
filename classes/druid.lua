@@ -15,6 +15,12 @@ function iCD:DRUID(specID)
 			showTimeAfterCast = true,
 			covenant = iCD.covenants.NIGHTFAE
 		},
+		[326446] = { -- Kindred Spirits 312946
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.KYRIAN,
+			icon = 3565444,
+		},
 	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
@@ -54,7 +60,27 @@ function iCD:DRUID(specID)
 			end,
 		}
 		t.row1 = {
-			-- Cat form
+			[191034] = { -- Starfall (Stellar Drift)
+				order = 1,
+				cost = true,
+				stack = true,
+				stackFunc = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Starfall')
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura,'%.0f'
+						else
+							return dura, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,		
+				showFunc = function()
+					return select(4, GetTalentInfo(6, 2, 1))
+				end,
+			},
 			[202770] = { -- Fury of Elune
 				order = 5,
 				range = true,
@@ -78,12 +104,33 @@ function iCD:DRUID(specID)
 				end,
 				showTimeAfterCast = true,
 			},
+			[202425] = { -- Warrior of Elune
+				order = 30,
+				stack = true,
+				stackFunc = function()
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Warrior of Elune')
+					return count or ""
+				end,	
+				showFunc = function()
+					return select(4, GetTalentInfo(1, 2, 1))
+				end,	
+			},
 		}
 		t.row2 = {
 			[194223] = { -- Celestial Alignment
 				order = 5,
 				level = 48,
 				showTimeAfterCast = true,
+				showFunc = function()
+					return not select(4, GetTalentInfo(5, 3, 1))
+				end,
+			},
+			[102560] = { -- Incarnation: Chosen of Elune
+				order = 5,
+				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(5, 3, 1))
+				end,
 			},
 			[205636] = { -- Force of Nature
 				order = 7,
@@ -158,6 +205,12 @@ function iCD:DRUID(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
+			[102793] = { -- Ursol's Vortex
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 3, 1))
+				end,
+				showTimeAfterGCD = true,
+			},
 			[48438] = { -- Wild Growth
 				showFunc = function()
 					return select(4, GetTalentInfo(3, 3, 1))
@@ -171,11 +224,7 @@ function iCD:DRUID(specID)
 					return select(4, GetTalentInfo(4, 1, 1))
 				end,
 			},
-			[132469] = { -- Typhoon
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 3, 1))
-				end,
-			},
+			[132469] = {}, -- Typhoon
 			[102359] = { -- Mass Entanglement
 				showFunc = function()
 					return select(4, GetTalentInfo(4, 2, 1))
@@ -265,6 +314,10 @@ function iCD:DRUID(specID)
 				order = 10,
 				ignoreGCD = true,
 			},
+			[22812] = { -- Barksin
+				order = 15,
+				ignoreGCD = true,
+			},
 		}
 		t.row3 = {
 			[1822] = { -- Rake
@@ -332,7 +385,7 @@ function iCD:DRUID(specID)
 			},
 			[132469] = { -- Typhoon
 				showFunc = function()
-					return select(4, GetTalentInfo(4, 3, 1))
+					return select(4, GetTalentInfo(3, 1, 1))
 				end,
 			},
 			[2782] = {}, --Remove Corruption
@@ -642,7 +695,7 @@ function iCD:DRUID(specID)
 				cost = true,
 				showTimeAfterCast = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
+					return select(4, GetTalentInfo(6, 3, 1))
 				end,
 			},
 			[102351] = { -- Cenarion Ward
@@ -686,6 +739,37 @@ function iCD:DRUID(specID)
 					return c > 0 and c or ''
 				end,
 				glow = true,
+			},
+			[33917] = { -- Mangle
+				order = 15,
+				range = true,
+				showFunc = function()
+					local aff = select(4, GetTalentInfo(3, 3, 1)) -- Guardian Affinity
+					if not aff then return end
+					local form = GetShapeshiftFormID() or 0
+					return form == BEAR_FORM
+				end,
+			},
+			[77758] = { -- Thrash
+				order = 20,
+				range = true,
+				showFunc = function()
+					local aff = select(4, GetTalentInfo(3, 3, 1)) -- Guardian Affinity
+					if not aff then return end
+					local form = GetShapeshiftFormID() or 0
+					return form == BEAR_FORM
+				end,
+			},
+			[22842] = { -- Frenzied Regeneration
+				order = 25,
+				cost = true,
+				stack = true,
+				showFunc = function()
+					local aff = select(4, GetTalentInfo(3, 3, 1)) -- Guardian Affinity
+					if not aff then return end
+					local form = GetShapeshiftFormID() or 0
+					return form == BEAR_FORM
+				end,
 			},
 		}
 		t.row2 = {
@@ -758,6 +842,11 @@ function iCD:DRUID(specID)
 			[319454] = { -- Heart of the Wild
 				showFunc = function()
 					return select(4, GetTalentInfo(4, 3, 1))
+				end,
+			},
+			[99] = { -- Incapacitating Roar
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 3, 1))
 				end,
 			},
 		}

@@ -53,14 +53,10 @@ local buffFrames = {
 local currentCovenant = 0
 
 --APIs to locals
-local IsItemInRange = IsItemInRange
-local IsSpellInRange = IsSpellInRange
-local UnitCastingInfo = UnitCastingInfo
-local GetItemCooldown = GetItemCooldown
-local GetSpellCooldown = GetSpellCooldown
-local GetTime = GetTime
-local GetSpellCharges = GetSpellCharges
+local IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges =
+	IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges
 --
+
 local function spairs(t, order)
     -- collect the keys
     local keys = {}
@@ -526,7 +522,7 @@ function iCD:updateFrame(id, row)
 	end
 	if buffFrames[row] then
 		if data.customText then
-			text, f = data.customText(data, gcdInfo)
+			local text, f = data.customText(data, gcdInfo)
 			if f then
 				iCD.frames[row][id].cooldownText:SetFormattedText(f, text)
 			else
@@ -1904,7 +1900,8 @@ function addon:PLAYER_LOGIN()
 		end
 	end
 end
-function addon:PLAYER_SPECIALIZATION_CHANGED()
+function addon:PLAYER_SPECIALIZATION_CHANGED(unitID)
+	if unitID ~= "player" then return end
 	iCD.class = select(2,UnitClass('player'))
 	iCD.specID = GetSpecializationInfo(GetSpecialization())
 	iCD.spellData = iCD[iCD.class](nil, iCD.specID)
@@ -2065,7 +2062,7 @@ function addon:UNIT_AURA(unitID)
 end
 function addon:PLAYER_EQUIPMENT_CHANGED()
 	UpdateAzeritePowers()
-	addon:PLAYER_SPECIALIZATION_CHANGED()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 function addon:UPDATE_SHAPESHIFT_FORM()
 	iCD:UpdateSkills()
@@ -2074,18 +2071,18 @@ function addon:AZERITE_EMPOWERED_ITEM_SELECTION_UPDATED(arg)
 	UpdateAzeritePowers()
 end
 function addon:AZERITE_ESSENCE_CHANGED()
-	addon:PLAYER_SPECIALIZATION_CHANGED()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 function addon:AZERITE_ESSENCE_UPDATE()
-	addon:PLAYER_SPECIALIZATION_CHANGED()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 function addon:PLAYER_LEVEL_CHANGED()
 	iCD.level = UnitLevel('player')
-	addon:PLAYER_SPECIALIZATION_CHANGED()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 function addon:PLAYER_LEVEL_UP()
 	--iCD.level = UnitLevel('player')
-	--addon:PLAYER_SPECIALIZATION_CHANGED()
+	--addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 function addon:SOULBIND_ACTIVATED()
 	iCD:UpdateSkills()
@@ -2095,7 +2092,7 @@ function addon:SOULBIND_PATH_CHANGED()
 end
 function addon:COVENANT_CHOSEN(covenantID)
 	currentCovenant = C_Covenants.GetActiveCovenantID()
-	addon:PLAYER_SPECIALIZATION_CHANGED()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 --------------------
 ---NAMEPLATE-RANGE--
@@ -2302,7 +2299,7 @@ SlashCmdList["ICD"] = function(msg)
 	end
 	if msg == "force" or msg == "f" then
 		UpdateAzeritePowers()
-		addon:PLAYER_SPECIALIZATION_CHANGED()
+		addon:PLAYER_SPECIALIZATION_CHANGED("player")
 		if IroniStreamIconsUpdate then IroniStreamIconsUpdate() else print("Error: Addon isn't enabled") end
 		return
 	elseif msg == "removed" then

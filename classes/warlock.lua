@@ -37,20 +37,21 @@ function iCD:WARLOCK(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(6, 2, 1))
 				end,
-			},
-			[264106] = { -- Deathbolt
-				order = 7,
-				range = true,
-				cost = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(1, 3, 1))
-				end,
+				showTimeAfterCast = true,
 			},
 			[205179] = { -- Phantom Singularity
 				order = 9,
 				range = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(4, 2, 1))
+				end,
+			},
+			[278350] = { -- Vile Taint
+				order = 9,
+				cost = true,
+				showTimeAfterCast = true,
+				showFunc = function()
+					return select(4, GetTalentInfo(4, 3, 1))
 				end,
 			},
 		}
@@ -62,19 +63,32 @@ function iCD:WARLOCK(specID)
 			[205180] = { -- Summon Darkglare
 				order = 3,
 			},
+			[113860] = { -- Dark Soul: Misery
+				order = 4,
+				showFunc = function()
+					return select(4, GetTalentInfo(7, 3, 1))
+				end,
+				ignoreGCD = true,
+			},
+			[108416] = { -- Dark Pact
+				order = 10,
+				showFunc = function()
+					return select(4, GetTalentInfo(3, 3, 1))
+				end,
+				ignoreGCD = true,
+			},
 		}
 		t.row3 = {
 			[172] = { -- Corruption
 				order = 3,
-				customText = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Corruption')
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Corruption', true)
 					if expirationTime then
-						if duration == 0 then return "+" end
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -83,15 +97,14 @@ function iCD:WARLOCK(specID)
 			},
 			[980] = { -- Agony
 				order = 4,
-				customText = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Agony')
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Agony', true)
 					if expirationTime then
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							--return string.format('%.0f', dura)
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -100,44 +113,18 @@ function iCD:WARLOCK(specID)
 			},
 			[30108] = { -- Unstable Affliction
 				order = 2,
-				customText = function()
-					local shortest
-					for i = 1, 40 do
-						local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitDebuff('target', i, 'player')
-						if not name then
-							break
-						end
-						if name == "Unstable Affliction" then
-							if not shortest or expirationTime < shortest then
-								shortest = expirationTime
-							end
-						end
-					end
-					if shortest then
-						local dura = shortest - GetTime()
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Unstable Affliction', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							--return string.format('%.0f', dura)
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
 					end
-				end,
-				stack = true,
-				stackFunc = function()
-					local c = 0
-					for i = 1, 40 do
-						local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellID = UnitDebuff('target', i, 'player')
-						if not name then
-							break
-						end
-						if name == "Unstable Affliction" then
-							c = c + 1
-						end
-					end
-					return c > 0 and c or ""
 				end,
 			},
 			[63106] = { -- Siphon Life
@@ -145,15 +132,14 @@ function iCD:WARLOCK(specID)
 				showFunc = function()
 					return select(4, GetTalentInfo(2,3,1))
 				end,
-				customText = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Siphon Life')
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Siphon Life', true)
 					if expirationTime then
 						local dura = expirationTime - GetTime()
 						if dura > 5 then
-							--return string.format('%.0f', dura)
-							return dura, '%.0f'
+							return dura-gcdInfo.left, '%.0f'
 						else
-							return dura, '|cffff1a1a%.1f'
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
 						end
 					else
 						return ''
@@ -179,9 +165,11 @@ function iCD:WARLOCK(specID)
 					return select(4, GetTalentInfo(3,2,1))
 				end,
 			},
-			[273525] = { -- Inevitable Demise
+			[334320] = { -- Inevitable Demise
 				stack = true,
-				azerite = 183,
+				showFunc = function()
+					return select(4, GetTalentInfo(1,2,1))
+				end,
 			},
 		}
 		t.buffsI = {
@@ -266,7 +254,7 @@ function iCD:WARLOCK(specID)
 				order = 7,
 				cost = true,
 				showFunc = function()
-					return select(4, GetTalentInfo(1, 3, 1))
+					return select(4, GetTalentInfo(1, 2, 1))
 				end,
 				showTimeAfterCast = true,
 			},
@@ -279,11 +267,18 @@ function iCD:WARLOCK(specID)
 				showTimeAfterCast = true,
 			},
 			[264119] = { -- Summon Vilefiend
-				order = 9,
+				order = 3,
 				range = true,
 				cost = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(4, 3, 1))
+				end,
+				showTimeAfterCast = true,
+			},
+			[267171] = { -- Demonic Strength
+				order = 7,
+				showFunc = function()
+					return select(4, GetTalentInfo(1, 3, 1))
 				end,
 				showTimeAfterCast = true,
 			},
@@ -341,22 +336,41 @@ function iCD:WARLOCK(specID)
 					end
 				end,
 			},
+			[603] = { -- Doom
+				order = 1,
+				showFunc = function()
+					return select(4, GetTalentInfo(2,3,1))
+				end,
+				customText = function(data, gcdInfo)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Doom', true)
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							return dura-gcdInfo.left, '%.0f'
+						else
+							return dura-gcdInfo.left, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
+				end,
+			},
 		}
 		t.row4 = {
-
 			[111771] = {}, -- Demonic Gateway
 			[6789] = { -- Mortal Coil
 				showFunc = function()
-					return select(4, GetTalentInfo(3,2,1))
+					return select(4, GetTalentInfo(5,2,1))
 				end,
 			},
+			[30283] = {}, -- Shadowfury
+			[119910] = {}, -- Spell Lock
+			[19505] = {}, -- Devour Magic
+			[48020] = {}, -- Demonic Circle: Teleport
 		}
 		t.buffsC = {
 		}
 		t.buffsI = {
-			[603] = { -- Doom
-				debuff = true,
-			},
 			[264173] = { -- Demonic Calling
 				stack = true,
 			},
@@ -391,7 +405,16 @@ function iCD:WARLOCK(specID)
 							return select(4, GetTalentInfo(4, 3, 1))
 						end,
 						showTimeAfterCast = true,
-					}
+					},
+					[17877] = { -- Shadowburn
+						stack = true,
+						order = 10,
+						cost = true,
+						showFunc = function()
+							return select(4, GetTalentInfo(4, 3, 1))
+						end,
+						showTimeAfterCast = true,
+					},
 				}
 				t.row2 = {
 					[1122] = { -- Summon Infernal
@@ -417,15 +440,14 @@ function iCD:WARLOCK(specID)
 				t.row3 = {
 					[157736] = { -- Immolate
 						order = 3,
-						customText = function()
-							local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('Immolate')
+						customText = function(data, gcdInfo)
+							local count, duration, expirationTime, value1, value2, value3 = iCD.UnitDebuff('target', 'Immolate', true)
 							if expirationTime then
-								if duration == 0 then return "+" end
 								local dura = expirationTime - GetTime()
 								if dura > 5 then
-									return dura, '%.0f'
+									return dura-gcdInfo.left, '%.0f'
 								else
-									return dura, '|cffff1a1a%.1f'
+									return dura-gcdInfo.left, '|cffff1a1a%.1f'
 								end
 							else
 								return ''
@@ -436,11 +458,6 @@ function iCD:WARLOCK(specID)
 				t.row4 = {
 					[111771] = {}, -- Demonic Gateway
 					[30283] = {}, -- Shadowfury
-					[6789] = { -- Mortal Coil
-						showFunc = function()
-							return select(4, GetTalentInfo(3,2,1))
-						end,
-					},
 				}
 				t.buffsC = {
 				}

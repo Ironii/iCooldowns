@@ -216,6 +216,12 @@ function iCD:GetGenerals(specID)
 					return race == 'Scourge'
 				end,
 			},
+			[20577] = { -- Will of the Forsaken
+				showFunc = function()
+					local _, race = UnitRace('player')
+					return race == 'Scourge'
+				end,
+			},
 			[202719] = { -- Arcane Torrent ( Pain )
 				showFunc = function()
 					local _, race = UnitRace('player')
@@ -328,12 +334,13 @@ function iCD:GetGenerals(specID)
 			[-173944] = {}, -- Forbidden Obsidian Claw
 			[-178811] = {}, -- Grim Codex
 			[-184031] = {}, -- Sanguine Vintage
+			[-185304] = {}, -- Unchained Gladiator's Medallion
 			[-184020] = {}, -- Tuft of Smoldering Plumage
 			[-13446] = { -- Major Combat Healing Potion (HP potion cd)
 				utility = true,
 				stack = true,
 				stackFunc = function()
-					return GetItemCount(171267) or 0 -- Spiritual Healing Potion
+					return GetItemCount(187802) or 0 -- Cosmic Healing Potion
 				end,
 			},
 			[-86125] = { -- Kafa Press (DPS potion)

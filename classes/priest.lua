@@ -17,7 +17,8 @@ function iCD:PRIEST(specID)
 		[323673] = { -- Mindgames
 			order = 999999, -- Always last
 			showTimeAfterCast = true,
-			covenant = iCD.covenants.VENTHYR
+			covenant = iCD.covenants.VENTHYR,
+			cost = true,
 		},
 	}
 	temp.all.row2 = {
@@ -39,6 +40,9 @@ function iCD:PRIEST(specID)
 		[325013] = { -- Ascended Boon
 			stack = true,
 		},
+		[357028] = { -- Mindgames legendary
+			stack = true,
+		}
 	}
 	local t = temp.spec
 	t.row1 = {}
@@ -114,6 +118,9 @@ function iCD:PRIEST(specID)
 				range = true,
 				cost = true,
 				stack = true,
+				glow = true,
+				glowSound = "text2",
+				showTimeAfterCast = true,
 			},
 		}
 		t.row2 = {
@@ -148,6 +155,7 @@ function iCD:PRIEST(specID)
 			[586] = { -- Fade
 				order = 20,
 				ignoreGCD = true,
+				allowOverride = true,
 			},
 			[33206] = { -- Pain Suppression
 				order = 7,
@@ -308,6 +316,7 @@ function iCD:PRIEST(specID)
 			[586] = { -- Fade
 				order = 20,
 				ignoreGCD = true,
+				allowOverride = true,
 			},
 			[47788] = { -- Guardian Spirit
 				order = 10,
@@ -329,6 +338,7 @@ function iCD:PRIEST(specID)
 				order = 5,
 				cost = true,
 				showTimeAfterCast = true,
+				stack = true,
 			},
 			[34861] = { -- Holy Word: Sanctify
 				order = 10,
@@ -469,6 +479,7 @@ function iCD:PRIEST(specID)
 			[586] = { -- Fade
 				order = 9,
 				ignoreGCD = true,
+				allowOverride = true,
 			},
 			[47585] = { -- Dispersion
 				order = 10,

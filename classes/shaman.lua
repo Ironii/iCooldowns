@@ -10,6 +10,12 @@ function iCD:SHAMAN(specID)
 			covenant = iCD.covenants.NECROLORD,
 			range = true,
 		},
+		[320674] = { -- Chain Harvest
+			order = 9999,
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.VENTHYR,
+			range = true,
+		},
 	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}

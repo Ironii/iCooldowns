@@ -53,8 +53,8 @@ local buffFrames = {
 local currentCovenant = 0
 
 --APIs to locals
-local IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges =
-	IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges
+local IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges, FindSpellOverrideByID =
+	IsItemInRange,IsSpellInRange, UnitCastingInfo, GetItemCooldown, GetSpellCooldown, GetTime, GetSpellCharges, FindSpellOverrideByID
 --
 
 local function spairs(t, order)
@@ -502,76 +502,60 @@ local function getGeneralCooldown(id)
 	end
 end
 do
-	local gcdInfo = {
-		left = 0,
-		duration = 0,
-		start = 0,
-		lastFrame = 0,
-	}
-function iCD:updateFrame(id, row)
-	local data = iCD.frames[row][id].data
-	if gcdInfo.lastFrame ~= GetTime() then -- TODO : Change whole function to use this
-		local gS, gcdD = getGeneralCooldown()
-		local gCD = gS+gcdD-GetTime()
-		gcdInfo = {
-			left = gCD > 0 and gCD or 0,
-			duration = gcdD,
-			start = gS,
-			lastFrame = GetTime()
-		}
-	end
+function iCD:updateFrame(id, row, frame, gcdInfo)
+	--local data = iCD.frames[row][id].data
 	if buffFrames[row] then
-		if data.customText then
-			local text, f = data.customText(data, gcdInfo)
+		if frame.data.customText then
+			local text, f = frame.data.customText(frame.data, gcdInfo)
 			if f then
-				iCD.frames[row][id].cooldownText:SetFormattedText(f, text)
+				frame.cooldownText:SetFormattedText(f, text)
 			else
-				iCD.frames[row][id].cooldownText:SetText(text)
+				frame.cooldownText:SetText(text)
 			end
 		else
-			local text = data.endTime-GetTime()
+			local text = frame.data.endTime-GetTime()
 			if text > 60 then
 				local s = (math.floor(text * 10 + 0.5) / 10)%60
 				local m = math.floor(text/60)
-				iCD.frames[row][id].cooldownText:SetFormattedText('%d:%.2d', m,s)
+				frame.cooldownText:SetFormattedText('%d:%.2d', m,s)
 			elseif text > 5 then
-				iCD.frames[row][id].cooldownText:SetFormattedText('%.0f', text)
+				frame.cooldownText:SetFormattedText('%.0f', text)
 			elseif text > 0 then
-				iCD.frames[row][id].cooldownText:SetFormattedText('|cffff1a1a%.1f', text)
+				frame.cooldownText:SetFormattedText('|cffff1a1a%.1f', text)
 			else
-				iCD.frames[row][id].cooldownText:SetText('')
+				frame.cooldownText:SetText('')
 			end
 
 			if text <= 3 and text >= 0 then
-				if not iCD.frames[row][id].anim then
-					iCD.frames[row][id]:SetAlpha(1)
-					iCD.frames[row][id].flash:Play()
+				if not frame.anim then
+					frame:SetAlpha(1)
+					frame.flash:Play()
 				end
-			elseif iCD.frames[row][id].anim then
-				iCD.frames[row][id]:SetAlpha(1)
-				iCD.frames[row][id].flash:Stop()
+			elseif frame.anim then
+				frame:SetAlpha(1)
+				frame.flash:Stop()
 			end
 		end
 	else
 		local cost = false
 		local range = false
-		if data.customCost then
-			if data.customCost(data, gcdInfo) then
+		if frame.data.customCost then
+			if frame.data.customCost(frame.data, gcdInfo) then
 				cost = true
 			end
-		elseif data.cost then
-			if select(2, IsUsableSpell(data.spellName)) then
+		elseif frame.data.cost then
+			if select(2, IsUsableSpell(frame.data.spellName)) then
 				cost = true
 			end
 		end
-		if data.customRange then
-			if not data.customRange(data, gcdInfo) then
+		if frame.data.customRange then
+			if not frame.data.customRange(frame.data, gcdInfo) then
 				range = true
 			end
-		elseif data.range then
-			local rangeSpell = data.customRangeSpell or data.spellName
-			if data.customRangeSpell and tonumber(data.customRangeSpell) then
-				if not IsItemInRange(data.customRangeSpell*-1, 'target') then
+		elseif frame.data.range then
+			local rangeSpell = frame.data.customRangeSpell or frame.data.spellName
+			if frame.data.customRangeSpell and tonumber(frame.data.customRangeSpell) then
+				if not IsItemInRange(frame.data.customRangeSpell*-1, 'target') then
 				range = true
 				end
 			else
@@ -580,70 +564,47 @@ function iCD:updateFrame(id, row)
 				end
 			end
 		end
-		--if data.customColor then
-		--	local r,g,b,a = data.customColor()
-		--	local colorStr = string.format("%s%s%s%s", r or 0,g or 0,b or 0,a or 0)
-		--	if data.unMod ~= colorStr then
-		--		iCD.frames[row][id].tex:SetVertexColor(r,g,b,a)
-		--		iCD.frames[row][id].data.unMod = colorStr
-		--	end
-		if data.AM and data.AM(data, gcdInfo) then
-			if data.unMod ~= 'am' then
-				iCD.frames[row][id].tex:SetVertexColor(1,0,1,1)
-				iCD.frames[row][id].data.unMod = 'am'
+		if frame.data.AM and frame.data.AM(frame.data, gcdInfo) then
+			if frame.data.unMod ~= 'am' then
+				frame.tex:SetVertexColor(1,0,1,1)
+				frame.data.unMod = 'am'
 			end
 		elseif range then
-			if data.unMod ~= 'range' then
-				iCD.frames[row][id].tex:SetVertexColor(1,0,0,1)
-				iCD.frames[row][id].data.unMod = 'range'
+			if frame.data.unMod ~= 'range' then
+				frame.tex:SetVertexColor(1,0,0,1)
+				frame.data.unMod = 'range'
 			end
 		elseif cost then
-			if data.unMod ~= 'cost' then
-				iCD.frames[row][id].tex:SetVertexColor(0.5,0.5,1,1)
-				iCD.frames[row][id].data.unMod = 'cost'
+			if frame.data.unMod ~= 'cost' then
+				frame.tex:SetVertexColor(0.5,0.5,1,1)
+				frame.data.unMod = 'cost'
 			end
 		else
-			if data.unMod ~= 'none' then
-				iCD.frames[row][id].tex:SetVertexColor(1,1,1,1)
-				iCD.frames[row][id].data.unMod = 'none'
+			if frame.data.unMod ~= 'none' then
+				frame.tex:SetVertexColor(1,1,1,1)
+				frame.data.unMod = 'none'
 			end
 		end
 		local text = 0
-		if data.customText then
-			text, f = data.customText(data, gcdInfo)
+		if frame.data.customText then
+			text, f = frame.data.customText(frame.data, gcdInfo)
 			if f then
-				iCD.frames[row][id].cooldownText:SetFormattedText(f, text)
+				frame.cooldownText:SetFormattedText(f, text)
 			else
-				iCD.frames[row][id].cooldownText:SetText(text)
+				frame.cooldownText:SetText(text)
 			end
 		else
 			local gS, gcdD = getGeneralCooldown()
 			local gCD = gS+gcdD-GetTime()
 			local s, cd = 0,0
 			local readyDuringCast = false
-			if data.customDuration then
-				text = data.customDuration - GetTime()
-			elseif data.showTimeAfterGCD then
-				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+			if frame.data.customDuration then
+				text = frame.data.customDuration - GetTime()
+			elseif frame.data.showTimeAfterGCD then
+				local s,cd,c,m = getGeneralCooldown(frame.data.allowOverride and FindSpellOverrideByID(frame.data.usedBy) or frame.data.usedBy)
 				if c and c == m then
 					s = 0
 				end
-				--[[
-				if data.charges then
-					local c,m,sd,d = GetSpellCharges(data.usedBy)
-					if c == m then
-						s = 0
-						cd = d
-					else
-						s = sd
-						cd = d
-					end
-				elseif data.item or data.usedBy < 0 then
-					s,cd = GetItemCooldown(data.usedBy > 0 and data.usedBy or -data.usedBy)
-				else
-					s,cd = GetSpellCooldown(data.usedBy)
-				end
-				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
 					if gcdD ~= cd then
@@ -654,27 +615,11 @@ function iCD:updateFrame(id, row)
 						end
 					end
 				end
-			elseif data.showTimeAfterCast then
-				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+			elseif frame.data.showTimeAfterCast then
+				local s,cd,c,m = getGeneralCooldown(frame.data.allowOverride and FindSpellOverrideByID(frame.data.usedBy) or frame.data.usedBy)
 				if c and c == m then
 					s = 0
 				end
-				--[[
-				if data.charges then
-					local c,m,sd,d = GetSpellCharges(data.usedBy)
-					if c == m then
-						s = 0
-						cd = d
-					else
-						s = sd
-						cd = d
-					end
-				elseif data.item or data.usedBy < 0 then
-					s,cd = GetItemCooldown(data.usedBy > 0 and data.usedBy or -data.usedBy)
-				else
-					s,cd = GetSpellCooldown(data.usedBy)
-				end
-				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
 					if gcdD ~= cd then
@@ -703,36 +648,15 @@ function iCD:updateFrame(id, row)
 					end
 				end
 			else
-				local s,cd,c,m = getGeneralCooldown(data.usedBy)
+				local s,cd,c,m = getGeneralCooldown(frame.data.allowOverride and FindSpellOverrideByID(frame.data.usedBy) or frame.data.usedBy)
 				if c and c == m then
 					s = 0
 				end
-				--[[
-				if data.charges then
-					local c,m,sd,d = GetSpellCharges(data.usedBy)
-					if c == m then
-						s = 0
-						cd = d
-					else
-						s = sd
-						cd = d
-					end
-				elseif data.usedBy < 0 then
-					s,cd = GetItemCooldown(-data.usedBy)
-				else
-					s,cd = GetSpellCooldown(data.usedBy)
-				end
-				--]]
 				local cdD = s+cd-GetTime()
 				if s > 0 then
-					if data.ignoreGCD or data.item then
+					if frame.data.ignoreGCD or frame.data.item then
 						text = cdD
 					else
-						--local gS, gcdD = GetSpellCooldown(iCD.gcd)
-						--local gCD = gS+gcdD-GetTime()
-						--gCD = gS+gcdD-GetTime()
-						--if gCD < cdD then
-						--print(data.usedBy, cd, gcdD)
 						if gcdD ~= cd then
 							text = cdD
 						end
@@ -742,98 +666,97 @@ function iCD:updateFrame(id, row)
 			if row == 'row2' then
 				if text > 0 then
 					local fade = true
-					if data.stack then
-						local c,m,sd,d = GetSpellCharges(data.usedBy)
+					if frame.data.stack then
+						local c,m,sd,d = GetSpellCharges(frame.data.usedBy)
 						if c > 0 then
 							fade = false
 						end
 					end
 					if fade then
-						iCD.frames[row][id]:SetAlpha(.35)
+						frame:SetAlpha(.35)
 					else
-						iCD.frames[row][id]:SetAlpha(1)
+						frame:SetAlpha(1)
 					end
 				elseif text == 0 then
-					iCD.frames[row][id]:SetAlpha(1)
-					iCD.frames[row][id].onCD = false
+					frame:SetAlpha(1)
+					frame.onCD = false
 				end
 			end
-			if (data.showTimeAfterGCD and gcdD > 0) or (data.showTimeAfterCast and text > 0) then
+			if (frame.data.showTimeAfterGCD and gcdD > 0) or (frame.data.showTimeAfterCast and text > 0) then
 				if text > 60 then
 					local s = (math.floor(text * 10 + 0.5) / 10)%60
 					local m = math.floor(text/60)
-					iCD.frames[row][id].cooldownText:SetFormattedText('%d:%.2d', m,s)
+					frame.cooldownText:SetFormattedText('%d:%.2d', m,s)
 				elseif text > 5 then
 					if readyDuringCast then
-						iCD.frames[row][id].cooldownText:SetFormattedText('|cffFF9999(%.0f)', text)
+						frame.cooldownText:SetFormattedText('|cffFF9999(%.0f)', text)
 					else
-						iCD.frames[row][id].cooldownText:SetFormattedText('|cffFF9999%.0f', text)
+						frame.cooldownText:SetFormattedText('|cffFF9999%.0f', text)
 					end
 					
 				elseif text > 0 then
 					if text <= 0.05 then
-						iCD.frames[row][id].cooldownText:SetText('')
+						frame.cooldownText:SetText('')
 					elseif text < 2 then
 						if readyDuringCast then
-							iCD.frames[row][id].cooldownText:SetFormattedText('|cffCCFFFF(%.1f)', text)
+							frame.cooldownText:SetFormattedText('|cffCCFFFF(%.1f)', text)
 						else
-							iCD.frames[row][id].cooldownText:SetFormattedText('|cffCCFFFF%.1f', text)
+							frame.cooldownText:SetFormattedText('|cffCCFFFF%.1f', text)
 						end
 					else
 						if readyDuringCast then
-							iCD.frames[row][id].cooldownText:SetFormattedText('|cfffc2ffc(%.1f)', text)
+							frame.cooldownText:SetFormattedText('|cfffc2ffc(%.1f)', text)
 						else
-							iCD.frames[row][id].cooldownText:SetFormattedText('|cfffc2ffc%.1f', text)
+							frame.cooldownText:SetFormattedText('|cfffc2ffc%.1f', text)
 						end
 					end
 				else
 					if row == 'row4' then
 						iCD:updateCDs()
 					else
-						iCD.frames[row][id].cooldownText:SetText('')
+						frame.cooldownText:SetText('')
 					end
 				end
 			else
 				if text > 60 then
 					local s = (math.floor(text * 10 + 0.5) / 10)%60
 					local m = math.floor(text/60)
-					iCD.frames[row][id].cooldownText:SetFormattedText('%d:%.2d', m,s)
+					frame.cooldownText:SetFormattedText('%d:%.2d', m,s)
 				elseif text > 5 then
-					iCD.frames[row][id].cooldownText:SetFormattedText('%.0f', text)
+					frame.cooldownText:SetFormattedText('%.0f', text)
 				elseif text > 0 then
 					if row == 'row1' and ((gCD + 0.1 > text) or (gcdD == 0 and text < 0.3))then
-						iCD.frames[row][id].cooldownText:SetFormattedText('|cff00ff00%.1f', text)
+						frame.cooldownText:SetFormattedText('|cff00ff00%.1f', text)
 					else
-						iCD.frames[row][id].cooldownText:SetFormattedText('|cffff1a1a%.1f', text)
+						frame.cooldownText:SetFormattedText('|cffff1a1a%.1f', text)
 					end
 				else
 					if row == 'row4' then
 						iCD:updateCDs()
 					else
-						iCD.frames[row][id].cooldownText:SetText('')
+						frame.cooldownText:SetText('')
 					end
 				end
 			end
 		end
 	end
-	if data.stackFunc then
-		local txt, txtFormat = data.stackFunc(data, gcdInfo)
+	if frame.data.stackFunc then
+		local txt, txtFormat = frame.data.stackFunc(frame.data, gcdInfo)
 		if txtFormat then
-			iCD.frames[row][id].stackText:SetFormattedText(txtFormat, txt)
+			frame.stackText:SetFormattedText(txtFormat, txt)
 		else
-			iCD.frames[row][id].stackText:SetText(txt)
+			frame.stackText:SetText(txt)
 		end
-	elseif data.stack then
-		if type(data.stack) == "boolean" then
-			local s,cd,c,m = getGeneralCooldown(data.usedBy)
-			--local c,m,sd,d = GetSpellCharges(data.usedBy)
+	elseif frame.data.stack then
+		if type(frame.data.stack) == "boolean" then
+			local s,cd,c,m = getGeneralCooldown(frame.data.allowOverride and FindSpellOverrideByID(frame.data.usedBy) or frame.data.usedBy)
 			if m and m > 1 then
-				iCD.frames[row][id].stackText:SetText(c)
+				frame.stackText:SetText(c)
 			else
-				iCD.frames[row][id].stackText:SetText("")
+				frame.stackText:SetText("")
 			end
 		else
-			iCD.frames[row][id].stackText:SetText(data.stack)
+			frame.stackText:SetText(frame.data.stack)
 		end
 	end
 end
@@ -924,6 +847,10 @@ function iCD:updateCDs()
 		end
 	end
 	for k,v in pairs(iCD.onCD) do
+		--local spellIDToUse = k
+		if v.allowOverride then
+			k = FindSpellOverrideByID(k)
+		end
 		local s, cd
 		local s,cd,c,m,isItem = getGeneralCooldown(k)
 		if c and c == m then
@@ -978,6 +905,7 @@ function iCD:updateCDs()
 		iCD:CreateNewFrame(id, 'row4')
 		iCD.frames.row4[id].data = {}
 		iCD.frames.row4[id].data.usedBy = k
+		--allowOverride
 		--iCD.frames.row4[id].data.spellName = GetSpellInfo(k)
 		if v.customDuration then
 			iCD.frames.row4[id].data.customDuration = v.customDuration
@@ -1021,6 +949,7 @@ function iCD:updateCDs()
 		iCD.frames.row4[i].data = {}
 		iCD.frames.row4[i]:Hide()
 	end
+	temp = nil
 end
 function iCD:updateOnCD()
 	if not iCD.class or not iCD.specID then
@@ -1404,6 +1333,7 @@ function iCD:updateBuffs()
 		iCD.frames.buffsC[i].data = {}
 		iCD.frames.buffsC[i]:Hide()
 	end
+	temp, tempI, tempC = nil,nil,nil
 end
 function iCD:updateBuffList()
 	if not iCD.class or not iCD.specID then
@@ -1618,6 +1548,9 @@ function iCD:UpdateSkills()
 			if v.showTimeAfterCast then
 				iCD.frames[row][id].data.showTimeAfterCast = true
 			end
+			if v.allowOverride then
+				iCD.frames[row][id].data.allowOverride = true
+			end
 			if v.glow then
 				local glow = v.glow
 				if type(v.glow) == 'boolean' then
@@ -1694,90 +1627,59 @@ function iCD:addToRow4(spellID, isItem, dura, stackFunc)
 	end
 end
 
-function iCD.onUpdate()
+local function iCD_onUpdate()
 	--Out of range checking
 	iCD:checkRange()
 	-- durations
+	local gS, gcdD = getGeneralCooldown()
+	local gCD = gS+gcdD-GetTime()
+	local gcdInfo = {
+		left = gCD > 0 and gCD or 0,
+		duration = gcdD,
+		start = gS,
+	}
 	for k,v in pairs(iCD.frames.row1) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'row1')
+			iCD:updateFrame(k, 'row1', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.row2) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'row2')
+			iCD:updateFrame(k, 'row2', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.row3) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'row3')
+			iCD:updateFrame(k, 'row3', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.row4) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'row4')
+			iCD:updateFrame(k, 'row4', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.row5) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'row5')
+			iCD:updateFrame(k, 'row5', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.buffsI) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'buffsI')
+			iCD:updateFrame(k, 'buffsI', v, gcdInfo)
 		end
 	end
 	for k,v in pairs(iCD.frames.buffsC) do
 		if v.data.usedBy then
-			iCD:updateFrame(k, 'buffsC')
+			iCD:updateFrame(k, 'buffsC', v, gcdInfo)
 		end
 	end
-
 	if iCD.gcd then -- 8.2.5 loading screen fix
-		local gS, gcdD = GetSpellCooldown(iCD.gcd)
-		local gCD = (gS+gcdD-GetTime())/gcdD
-		iCD.GCD:SetValue(gCD)
+		iCD.GCD:SetValue(gCD/gcdD)
 	end
-	--[[
-	--- dh stuff
-	if iCD.textTimers then
-		local gcdEnd = gS + gcdD
-		local temp = {}
-		for i = 1, #iCD.textTimers do
-			if iCD.textTimers[i] > GetTime() then
-				temp[#temp+1] = iCD.textTimers[i]
-			end
-		end
-		local id = 0
-		for i = 1, #temp do
-			iCD:createTextString(i)
-			if gcdEnd < temp[i] then
-				if not iCD.textFrames[i].colored then
-					iCD.textFrames[i]:SetTextColor(1,0,0,1)
-					iCD.textFrames[i].colored = true
-				end
-			else
-				if iCD.textFrames[i].colored then
-					iCD.textFrames[i]:SetTextColor(1,1,1,1)
-					iCD.textFrames[i].colored = false
-				end
-			end
-			local timeLeft = temp[i]-GetTime()
-			iCD.textFrames[i]:SetFormattedText('%.1f', timeLeft)
-			iCD.textFrames[i]:Show()
-			id = i
-		end
-		for i = id+1, #iCD.textFrames do
-			iCD.textFrames[i]:Hide()
-		end
-			iCD.textAnchor:SetWidth(id*40)
-		iCD.textTimers = temp
-	end
-	--]]
+	gcdInfo = nil
 end
 addon:RegisterEvent('PLAYER_LOGIN')
-addon:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')
+addon:RegisterUnitEvent('PLAYER_SPECIALIZATION_CHANGED', 'player')
 addon:RegisterEvent('SPELL_ACTIVATION_OVERLAY_GLOW_SHOW')
 addon:RegisterEvent('SPELL_ACTIVATION_OVERLAY_GLOW_HIDE')
 addon:RegisterEvent('SPELL_UPDATE_COOLDOWN')
@@ -2188,6 +2090,7 @@ do
 	local nps = {}
 	local frames = {}
 	local function getString(unitID)
+		if frames[unitID] then return frames[unitID] end
 		frames[unitID] = CreateFrame('frame',nil, UIParent)
 		frames[unitID]:SetSize(1,1)
 		frames[unitID]:SetFrameStrata('HIGH')
@@ -2269,7 +2172,6 @@ do
 		local np = C_NamePlate.GetNamePlateForUnit(unitID)
 		if np then
 			nps[unitID] = np
-
 		end
 	end
 	function addon:NAME_PLATE_UNIT_REMOVED(unitID)
@@ -2289,7 +2191,7 @@ end
 function ICDTEST()
 	return iCD.onCD
 end
-iCD.row1:SetScript('OnUpdate', iCD.onUpdate)
+iCD.row1:SetScript('OnUpdate', iCD_onUpdate)
 
 SLASH_ICD1 = "/icd"
 SLASH_ICD2 = '/icooldowns'
@@ -2417,7 +2319,7 @@ function IANTORUS()
 					stat = stat ..'/'..string.format('%s%.0f',k,p)
 				end
 			end
-			s = s..stat..'\r'
+			s = s..stat..'\r'z
 		else
 			s = s..'\r'
 		end

@@ -710,6 +710,7 @@ function iCD:DRUID(specID)
 				order = 20,
 				range = true,
 				cost = true,
+				showTimeAfterCast = true,
 				showFunc = function()
 					return select(4, GetTalentInfo(3, 1, 1))
 				end,

@@ -19,6 +19,14 @@ function iCD:PRIEST(specID)
 			showTimeAfterCast = true,
 			covenant = iCD.covenants.VENTHYR,
 			cost = true,
+			range = true,
+		},
+		[324724] = { -- Unholy Nova
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.NECROLORD,
+			cost = true,
+			range = true,
 		},
 	}
 	temp.all.row2 = {
@@ -215,6 +223,9 @@ function iCD:PRIEST(specID)
 				end,
 			},
 			[47536] = {}, -- Rapture
+			[198069] = { -- Power of the Dark Side
+				stack = true,
+			},
 		}
 	elseif specID == 257 then --Holy
 		iCD.outOfRangeSpells = {

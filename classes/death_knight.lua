@@ -4,6 +4,7 @@ function iCD:DEATHKNIGHT(specID)
 	local temp = {}
 	temp.spec = {}
 	local t = temp.spec
+	if true then return temp end
 	temp.all = {}
 	temp.all.row1 = {
 		[43265] = { -- Death and Decay
@@ -103,6 +104,25 @@ function iCD:DEATHKNIGHT(specID)
 			end,
 			showTimeAfterGCD = true,
 		},
+		[312202] = { -- Shackle the Unworthy
+		order = 1e4,
+		covenant = iCD.covenants.KYRIAN,
+		stack = true,
+		stackFunc = function()
+			local expirationTime = select(6,GetPlayerAuraBySpellID(353823))
+			if expirationTime then
+				local dura = expirationTime - GetTime()
+				if dura > 5 then
+					return dura,'%.0f'
+				else
+					return dura, '|cffff1a1a%.1f'
+				end
+			else
+				return ''
+			end
+		end,
+		showTimeAfterGCD = true,
+	},
 	}
 	temp.all.row2 = {
 		[48707] = { -- Anti-Magic Shell

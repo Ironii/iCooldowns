@@ -19,6 +19,7 @@ customRange = function()
 	end
 end,
 --]]
+local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local _, iCD = ...
 function iCD:MONK(specID)
 	iCD.outOfRangeSpells = {
@@ -51,17 +52,148 @@ function iCD:MONK(specID)
 				end
 			end,
 		},
+		[326860] = { -- Fallen Order
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			range = true,
+			covenant = iCD.covenants.VENTHYR,
+			stack = true,
+			stackFunc = function()
+				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Fallen Order')
+				if expirationTime then
+					local dura = expirationTime - GetTime()
+					if dura > 5 then
+						--return string.format('%.0f', dura)
+						return dura, '%.0f'
+					else
+						return dura, '|cffff1a1a%.1f'
+					end
+				else
+					return ''
+				end
+			end,
+		},
+		[325216] = { -- Bonedust Brew
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.NECROLORD,
+		},
+		[327104] = { -- Faeline Stomp
+			order = 999999, -- Always last
+			showTimeAfterCast = true,
+			covenant = iCD.covenants.NIGHTFAE,
+		},
+		[322101] = { -- Expel Harm
+			order = 9,
+			stack = true,
+			stackFunc = function()
+				return GetSpellCount(322101)
+			end,
+			cost = true,
+			showTimeAfterGCD = true,
+			--level = 50,
+		},
+		[205523] = { -- Blackout Kick
+			order = 6,
+			range = true,
+			customRangeSpell = 'Tiger Palm',
+			stack = true,
+			showTimeAfterGCD = true,
+		},
+		[123986] = { -- Chi Burst
+			order = 10,
+			range = true,
+			talent = 101527,
+			showTimeAfterGCD = true,
+		},
+		[115098] = { -- Chi Wave
+			order = 10,
+			range = true,
+			talent = 101528,
+			showTimeAfterGCD = true,
+		},
 	}
-	temp.all.row2 = {}
+	temp.all.row2 = {
+		[122278] = { -- Dampen Harm
+			order = 10,
+			ignoreGCD = true,
+			talent = 101522,
+		},
+		[115203] = { -- Fortifying Brew
+			order = 11,
+			ignoreGCD = true,
+		},
+		[122783] = { -- Diffuse Magic
+			order = 11,
+			ignoreGCD = true,
+			talent = 101515
+		},
+		[388686] = {
+			order = 4, -- Summon White Tiger Statue
+			talent = 101519
+		},
+	}
 	temp.all.row3 = {}
-	temp.all.row4 = {}
-	temp.all.row5 = {}
+	temp.all.row4 = {
+		[119381] = {}, -- Leg Sweep
+		[116844] = { -- Ring of Peace
+			talent = 101516
+		},
+		[115315] = { -- Summon Black Ox Statue
+			talent = 101535,
+		},
+		[115078] = {  -- Paralysis
+			talent = 101506
+		},
+		[115546] = {}, -- Provoke
+		[101643] = {  -- Transcendence
+				talent = 101512
+		},
+		[119996] = {  -- Transcendence: Transfer
+			talent = 101512
+		},
+		[115008] = { -- Chi Torpedo
+			stack = true,
+			ignoreGCD = true,
+			talent = 101502
+		},
+		[109132] = { -- Roll
+			stack = true,
+			ignoreGCD = true,
+			talent = -101502
+		},
+		[116841] = { -- Tiger's Lust
+			talent = 101507
+		},
+		[322109] = {}, -- Touch of Death
+		[115313] = { -- Summon Jade Serpent Statue
+			order = 4,
+			talent = 101532
+		},
+	}
+	temp.all.row5 = {
+		[122783] = {  -- Diffuse Magic
+			talent = 101515,
+		},
+		[120954] = {}, -- Fortifying Brew
+		[122278] = {  -- Dampen Harm
+			talent = 101522
+		},
+	}
 	temp.all.buffsC = {}
 	temp.all.buffsI = {
 		[312106] = { -- Weapons of Order
 			covenant = iCD.covenants.KYRIAN,
 			stack = true,
 			debuff = true,
+		},
+		[325216] = { -- Bonedust Brew
+			covenant = iCD.covenants.NECROLORD,
+			debuff = true,
+		},
+		[119085] = { -- Chi Torpedo, speed buff
+			stack = true,
+			talent = 101502,
 		},
 	}
 	local t = temp.spec
@@ -107,30 +239,24 @@ function iCD:MONK(specID)
 			end,
 		}
 		t.row1 = {
+
 			[121253] = { -- Keg Smash
 				order = 2,
 				range = true,
 				cost = true,
 				showTimeAfterGCD = true,
 				stack = true,
+				talent = 101451,
 			},
-			[205523] = { -- Blackout Kick
-				order = 4,
+			[107428] = { -- Rising Sun Kick
+				order = 8,
 				range = true,
-				customRangeSpell = 'Tiger Palm',
-				stack = true,
-				stackFunc = select(4, GetTalentInfo(7, 3, 1)) and function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Blackout Combo')
-					if expirationTime then
-						return '+', '|cff00ff00%s'
-					else
-						return ' '
-					end
-				end or false,
 				showTimeAfterGCD = true,
+				stack = true,
+				talent = 101508,
 			},
 			[115181] = { -- Breath of Fire
-				order = 6,
+				order = 7,
 				stack = true,
 				glow = true,
 				glowSound = true,
@@ -144,13 +270,12 @@ function iCD:MONK(specID)
 					end
 				end,
 				showTimeAfterGCD = true,
+				talent = 101464,
 				--level = 29,
 			},
 			[116847] = { -- Rushing Jade Wind
-				order = 8,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 2, 1))
-				end,
+				order = 9,
+				talent = 101548,
 				stack = true,
 				stackFunc = function()
 					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Rushing Jade Wind')
@@ -163,87 +288,87 @@ function iCD:MONK(specID)
 				end,
 				showTimeAfterGCD = true,
 			},
-			[123986] = { -- Chi Burst
-				order = 10,
+			[387184] = { -- Weapons of Order (talent)
+				order = 20, -- Always last
+				showTimeAfterCast = true,
 				range = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(1, 3, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
-			[115098] = { -- Chi Wave
-				order = 10,
-				range = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(1, 2, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
-		}
-		t.row2 = {
-			[325153] = { -- Exploding Keg
-				order = 2,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 3, 1))
-				end,
-			},
-			[122281] = { -- Healing Elixir
-				order = 3,
-				stack = true,
-				ignoreGCD = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 2, 1))
-				end,
-			},
-			[122278] = { -- Dampening Harm
-				order = 4,
-				ignoreGCD = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
-				end,
-			},
-			[132578] = { -- Invoke Niuzao, the Black Ox
-				order = 6,
-				range = true,
-			},
-			[115176] = { -- Zen Meditation
-				order = 10,
-				ignoreGCD = true,
-				--level = 65,
-			},
-			[115203] = { -- Fortifying Brew
-			order = 8,
-				ignoreGCD = true,
-		},
-
-		}
-		t.row3 = {
-			[322101] = { -- Expel Harm
-				order = 10,
+				talent = 101539,
 				stack = true,
 				stackFunc = function()
-					return GetSpellCount(322101)
+					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Weapons of Order')
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						if dura > 5 then
+							--return string.format('%.0f', dura)
+							return dura, '%.0f'
+						else
+							return dura, '|cffff1a1a%.1f'
+						end
+					else
+						return ''
+					end
 				end,
-				cost = true,
-				showTimeAfterGCD = true,
-				--level = 50,
 			},
-			[119582] = { -- Purifying Brew
-				order = 5,
-				stack = true,
-				ignoreGCD = true,
+			[386276] = { -- Bonedust Brew
+				order = 18,
+				showTimeAfterCast = true,
+				talent = 101552,
+			}
+		}
+		t.row2 = {
+
+			[322507] = { -- Celestial Brew
+				order = 2,
+				showTimeAfterGCD = true,
+				talent = 101463
 			},
 			[115399] = { --Black Ox Brew
 				order = 3,
 				ignoreGCD = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(3, 3, 1))
+				talent = 101449,
+			},
+			[325153] = { -- Exploding Keg
+				order = 5,
+				talent = 101542,
+			},
+			[122281] = { -- Healing Elixir
+				order = 7,
+				stack = true,
+				ignoreGCD = true,
+				talent = 101458,
+			},
+
+			[132578] = { -- Invoke Niuzao, the Black Ox
+				order = 12,
+				talent = 101544,
+				stack = true,
+				stackFunc = function()
+					local expirationTime = select(6,GetPlayerAuraBySpellID(132578))
+					if expirationTime then
+						local dura = expirationTime - GetTime()
+						return dura, '%.0f'
+					else
+						return ''
+					end
 				end,
 			},
-			[322507] = { -- Celestial Brew
-				order = 2,
-				showTimeAfterGCD = true,
+			[115176] = { -- Zen Meditation
+				order = 16,
+				ignoreGCD = true,
+				--level = 65,
+				talent = 101547,
 			},
+
+		}
+		t.row3 = {
+
+			[119582] = { -- Purifying Brew
+				order = 5,
+				stack = true,
+				ignoreGCD = true,
+				talent = 101453,
+			},
+			--[[
 			[325092] = { -- Purified Chi
 				order = 1,
 				stack = true,
@@ -261,50 +386,16 @@ function iCD:MONK(specID)
 					end
 				end,
 				icon = 645193,
-			},
+			}, --]]
 		}
 		t.row4 = {
 			[218164] = {}, -- Detox
-			[119381] = {}, -- Leg Sweep
-			[116844] = { -- Ring of Peace
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 3, 1))
-				end,
-			},
-			[115315] = { -- Summon Black Ox Statue
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 2, 1))
-				end,
-			},
-			[115078] = {}, -- Paralysis
-			[115546] = {}, -- Provoke
-			[101643] = {}, -- Transcendence
-			[119996] = {}, -- Transcendence: Transfer
-			[115008] = { -- Chi Torpedo
-				stack = true,
-				ignoreGCD = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(2, 2, 1))
-				end,
-			},
-			[109132] = { -- Roll
-				stack = true,
-				ignoreGCD = true,
-				showFunc = function()
-					return not select(4, GetTalentInfo(2, 2, 1))
-				end,
-			},
-			[116841] = { -- Tiger's Lust
-				showFunc = function()
-					return  select(4, GetTalentInfo(2, 3, 1))
-				end,
-			},
-			[322109] = {}, -- Touch of Death
-			[324312] = {}, -- Clash
+			
+			[324312] = { -- Clash
+				talent = 101440
+			}, 
 		}
 		t.row5 = {
-			[120954] = {}, -- Fortifying Brew
-			[122278] = {}, -- Dampening Harm
 			[322507] = { -- Celestial Brew
 				stack = true,
 				stackFunc = function()
@@ -316,18 +407,22 @@ function iCD:MONK(specID)
 					end
 				end,
 			},
+			[132578] = { -- Invoke Niuzao, the Black Ox
+				stack = "Real",
+			},
+			[358520] = { -- Invoke Niuzao, the Black Ox, Legendary
+				stack = "Lege",
+			},
 
 		}
 		t.buffsC = {
-			[119085] = { -- Chi Torpedo, speed buff
-				stack = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(2, 2, 1))
-				end,
-			},
+
 		}
 		t.buffsI = {
 			[215479] = {}, -- Ironskin Brew
+			[366794] = { -- T29 (tier)
+				stack = true,
+			},
 		}
 	elseif specID == 269 then --Windwalker
 		t.power = {
@@ -380,14 +475,19 @@ function iCD:MONK(specID)
 					return select(4, GetTalentInfo(6, 2, 1))
 				end,
 			},
-			[322101] = { -- Expel Harm
-				order = 10,
-				range = true,
+
+			[101546] = { -- Spinning Crane Kick
+				order = 11,
+				stack = true,
+				stackFunc = function()
+					return GetSpellCount(101546)
+				end,
+				glow = true,
+				glowSound = true,
 				cost = true,
-				showTimeAfterGCD = true,
 			},
 			[115098] = { -- Chi Wave
-				order = 11,
+				order = 12,
 				cost = true,
 				showTimeAfterGCD = true,
 				showFunc = function()
@@ -395,7 +495,7 @@ function iCD:MONK(specID)
 				end,
 			},
 			[123986] = { -- Chi Burst
-				order = 11,
+				order = 12,
 				cost = true,
 				showTimeAfterGCD = true,
 				showFunc = function()
@@ -428,7 +528,7 @@ function iCD:MONK(specID)
 				order = 2,
 				stack = true,
 			},
-			[115080] = { -- Touch of Death
+			[322109] = { -- Touch of Death
 				order = 3,
 			},
 			[122470] = { -- Touch of Karma
@@ -436,10 +536,12 @@ function iCD:MONK(specID)
 				ignoreGCD = true,
 				range = true,
 			},
+			[243435] = { -- Fortifying Brew
+				ignoreGCD = true,
+				order = 9
+			}
 		}
-		t.row3 = {
-
-		}
+		t.row3 = {}
 		t.row4 = {
 			[101545] = {}, -- Flying Serpent Kick
 			[115078] = {}, -- Paralysis
@@ -499,6 +601,12 @@ function iCD:MONK(specID)
 			[137639] = {}, -- Storm, Earth, and Fire
 			[116768] = { -- Free blackout kick
 				stack = "+BOK",
+			},
+			[363911] = { -- Tier (T29)
+				stack = true,
+			},
+			[363924] = { -- Tier (T29)
+				stack = true,
 			},
 		}
 	elseif specID == 270 then --Mistweaver
@@ -644,6 +752,7 @@ function iCD:MONK(specID)
 			[101643] = {}, -- Transcendence
 			[119996] = {}, -- Transcendence: Transfer
 			[119381] = {}, -- Leg Sweep
+			[322109] = {}, -- Touch of Death
 			[115008] = { -- Chi Torpedo
 				stack = true,
 				ignoreGCD = true,
@@ -682,7 +791,11 @@ function iCD:MONK(specID)
 			[116680] = { -- Thunder Focus Tea
 				stack = true,
 			},
-			[197206]  = {} -- Uplifting Trance
+			[197206]  = {}, -- Uplifting Trance
+			[347553] = {}, -- Ancient Teachings of the Monestery (SL lege)
+			[343820] = { -- Chiji stacking
+				stack = true,
+			},
 		}
 	end
 	return temp

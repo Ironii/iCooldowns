@@ -957,7 +957,7 @@ function iCD:updateOnCD()
 	end
 	local temp = {}
 	for k,v in pairs(iCD.general.row4) do
-		if not v.showFunc or (v.showFunc and v.showFunc()) and (not v.level or v.level <= iCD.level) then
+		if not v.showFunc or (v.showFunc and v.showFunc()) and (not v.talent or iCD:IsTalentActive(v.talent)) and (not v.level or v.level <= iCD.level) then
 			if v.itemReq or k < 0 then
 				if type(v.itemReq) == 'table' then
 					for k,_ in pairs(v.itemReq) do
@@ -980,7 +980,7 @@ function iCD:updateOnCD()
 		end
 	end
 	for k,v in pairs(iCD.spellData.spec.row4) do
-		if not v.showFunc or (v.showFunc and v.showFunc()) then
+		if (not v.showFunc or (v.showFunc and v.showFunc())) and (not v.talent or iCD:IsTalentActive(v.talent)) then
 			if v.itemReq or k < 0 then
 				if type(v.itemReq) == 'table' then
 					for k,_ in pairs(v.itemReq) do
@@ -1003,7 +1003,7 @@ function iCD:updateOnCD()
 		end
 	end
 	for k,v in pairs(iCD.spellData.all.row4) do
-		if not v.showFunc or (v.showFunc and v.showFunc()) then
+		if (not v.showFunc or (v.showFunc and v.showFunc())) and (not v.talent or iCD:IsTalentActive(v.talent)) then
 			if v.itemReq or k < 0 then
 				if type(v.itemReq) == 'table' then
 					for k,_ in pairs(v.itemReq) do
@@ -1343,9 +1343,8 @@ function iCD:updateBuffList()
 	iCD.hasTargetDebuffs = false
 	iCD.hasPlayerBuffs = false
 	local function addIfEligible(spellID,v,b,d,p)
-		if v.showFunc then
-			if not v.showFunc() then return end
-		end
+		if v.showFunc and not v.showFunc() then return end
+		if v.talent and not iCD:IsTalentActive(v.talent) then return end
 		if v.itemReq then
 			if type(v.itemReq) == 'table' then
 				for k,_ in pairs(v.itemReq) do
@@ -1445,9 +1444,9 @@ function iCD:UpdateSkills()
 	local function add(k,v, row)
 		if v.level and v.level > iCD.level then return end
 		if v.covenant and v.covenant ~= currentCovenant then return end
-		if not v.showFunc or (v.showFunc and v.showFunc()) then
-			temp[row][k] = v
-		end
+		if v.showFunc and not v.showFunc() then return end
+		if v.talent and not iCD:IsTalentActive(v.talent) then return end
+		temp[row][k] = v
 	end
 	if not iCD.class or not iCD.specID then
 		return
@@ -1628,6 +1627,7 @@ function iCD:addToRow4(spellID, isItem, dura, stackFunc)
 end
 
 local function iCD_onUpdate()
+	--local time1 = debugprofilestop()
 	--Out of range checking
 	iCD:checkRange()
 	-- durations
@@ -1674,9 +1674,11 @@ local function iCD_onUpdate()
 		end
 	end
 	if iCD.gcd then -- 8.2.5 loading screen fix
-		iCD.GCD:SetValue(gCD/gcdD)
+		iCD.GCD:SetValue(gcdD == 0 and 0 or gCD/gcdD)
 	end
 	gcdInfo = nil
+	--local time2 = debugprofilestop()
+	--print(time2-time1)
 end
 addon:RegisterEvent('PLAYER_LOGIN')
 addon:RegisterUnitEvent('PLAYER_SPECIALIZATION_CHANGED', 'player')
@@ -1701,6 +1703,36 @@ addon:RegisterUnitEvent('UNIT_HEAL_ABSORB_AMOUNT_CHANGED', 'player')
 addon:RegisterUnitEvent('UNIT_SPELLCAST_SUCCEEDED', 'player')
 addon:RegisterUnitEvent('UNIT_TARGET', 'player')
 
+local currentTalents = {}
+local function checkTalents()
+	local configId = C_ClassTalents.GetActiveConfigID()
+	if not configId then return end
+	if not C_Traits.StageConfig(configId) then return end
+	currentTalents = {}
+  local configInfo = C_Traits.GetConfigInfo(configId)
+  for _, treeId in ipairs(configInfo.treeIDs) do
+    local nodes = C_Traits.GetTreeNodes(treeId)
+    for _, nodeId in ipairs(nodes) do
+      local node = C_Traits.GetNodeInfo(configId, nodeId)
+      if node.currentRank > 0 then
+          C_Traits.GetNodeInfo(C_ClassTalents.GetActiveConfigID(),102573)
+          if node.activeEntry and node.activeEntry.rank > 0 then
+            currentTalents[node.activeEntry.entryID] = true
+          end
+      end
+      --[[
+			if node.entryIDsWithCommittedRanks then
+				for _,talentId in pairs(node.entryIDsWithCommittedRanks) do
+          cachedTalents[talentId] = true
+				end
+			end
+      --]]
+    end
+  end
+end
+function iCD:IsTalentActive(entryID)
+	return entryID and ((entryID > 0 and currentTalents[entryID]) or (entryID < 0 and not currentTalents[-entryID]))
+end
 local function updateHealth()
 	local hp = UnitHealth('player')
 	local maxHP = UnitHealthMax('player')
@@ -1756,6 +1788,7 @@ function addon:PLAYER_LOGIN()
 	currentCovenant = C_Covenants.GetActiveCovenantID()
 	UpdateAzeritePowers()
 	--ICDTEST = iCD.spellData
+	checkTalents()
 	iCD:UpdateSkills()
 	iCD:updateBuffList()
 	iCD:updateOnCD()
@@ -1807,6 +1840,7 @@ function addon:PLAYER_SPECIALIZATION_CHANGED(unitID)
 	iCD.class = select(2,UnitClass('player'))
 	iCD.specID = GetSpecializationInfo(GetSpecialization())
 	iCD.spellData = iCD[iCD.class](nil, iCD.specID)
+	checkTalents()
 	iCD:UpdateSkills()
 	iCD:updateBuffList()
 	iCD:updateCombatLogStuff()
@@ -1994,6 +2028,10 @@ function addon:SOULBIND_PATH_CHANGED()
 end
 function addon:COVENANT_CHOSEN(covenantID)
 	currentCovenant = C_Covenants.GetActiveCovenantID()
+	addon:PLAYER_SPECIALIZATION_CHANGED("player")
+end
+addon:RegisterEvent("TRAIT_CONFIG_UPDATED")
+function addon:TRAIT_CONFIG_UPDATED(configID)
 	addon:PLAYER_SPECIALIZATION_CHANGED("player")
 end
 --------------------
@@ -2334,3 +2372,28 @@ end
 --=JOIN(",",FILTER('['&D3:L25&']='&L3:L25, NOT(ISBLANK(L3:L25))))
 
 
+function ICDTALENTTEST(id)
+	print(iCD:IsTalentActive(id))
+end
+
+
+
+
+
+
+function COUNTENTRYIDS()
+	local tr=C_Traits;
+	local cid=C_ClassTalents.GetActiveConfigID();
+	local cI=tr.GetConfigInfo(cid)
+	local c=0;
+	for _,tID in pairs(cI.treeIDs) do
+		for _,nID in pairs(tr.GetTreeNodes(tID)) do
+			local n=tr.GetNodeInfo(cid,nID)
+			if #n.entryIDsWithCommittedRanks>0 then
+				c=c+1 
+			end 
+		end 
+	end 
+	print(c)
+	--C_Traits.GetNodeInfo(C_ClassTalents.GetActiveConfigID(),102573)
+end

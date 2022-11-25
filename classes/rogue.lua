@@ -3,7 +3,14 @@ function iCD:ROGUE(specID)
 	local temp = {}
 	temp.spec = {}
 	temp.all = {}
-	temp.all.row1 = {}
+	temp.all.row1 = {
+		[323654] = { -- Flagellation
+			order = 999999, -- Always last
+			showTimeAfterGCD = true,
+			range = true,
+			covenant = iCD.covenants.VENTHYR
+		},
+	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
 	temp.all.row4 = {
@@ -161,7 +168,7 @@ function iCD:ROGUE(specID)
 		}
 	elseif specID == 260 then --Outlaw
 		iCD.outOfRangeSpells = {
-			main = 'Sinister Strike',
+			main = 'Shiv',
 			range = 'Pistol Shot',
 		}
 		t.power = {

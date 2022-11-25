@@ -861,10 +861,11 @@ function iCD:DRUID(specID)
 				stack = true,
 			},
 			[117679] = { -- Incarnation: Tree of Life
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
-				end,
+				--showFunc = function()
+					--return select(4, GetTalentInfo(5, 3, 1))
+				--end,
 			},
+			[197721] = {}, -- Flourish
 			[164815] = { -- Sunfire
 				debuff = true,
 			},
@@ -882,6 +883,9 @@ function iCD:DRUID(specID)
 			},
 			[48517] = {
 				stack = "W",
+			},
+			[363813] = {
+				stack = true,
 			},
 		}
 	end

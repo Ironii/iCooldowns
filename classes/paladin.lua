@@ -43,20 +43,6 @@ function iCD:PALADIN(specID)
 			range = true,
 			showTimeAfterGCD = true,
 			stack = true,
-			stackFunc = function(data, gcdInfo)
-				--328204
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', "Vanquisher's Hammer", true)
-					if expirationTime then
-						local dura = expirationTime - GetTime()
-						if dura > 5 then
-							return dura-gcdInfo.left, '%.0f'
-						else
-							return dura-gcdInfo.left, '|cffff1a1a%.1f'
-						end
-					else
-						return ''
-					end
-			end
 		},
 		[328620] = { -- Blessing of Seasons
 			order = 99999, -- Always last
@@ -96,7 +82,12 @@ function iCD:PALADIN(specID)
 		[642] = {}, -- Divine Shield
 		[221886] = {} -- Divine Steed
 	}
-	temp.all.buffsI = {}
+	temp.all.buffsI = {
+		[328204] = { -- Vanquisher's Hammer
+			covenant = iCD.covenants.NECROLORD,
+			stack = true,
+		}
+	}
 	temp.all.buffsC = {}
 	local t = temp.spec
 	t.row1 = {}

@@ -9,10 +9,82 @@ function iCD:DEMONHUNTER(specID)
 			showTimeAfterGCD = true,
 			covenant = iCD.covenants.KYRIAN
 		},
+		[317009] = {
+			order = 99999, -- Always last
+			showTimeAfterGCD = true,
+			covenant = iCD.covenants.VENTHYR
+		},
+		[232893] = { -- Felblade
+			order = 3,
+			range = true,
+			glow = true,
+			glowSound = true,
+			talent = 112842,
+			showTimeAfterGCD = true,
+		},
+		[258920] = { -- Immolation Aura
+			order = 6,
+			showTimeAfterGCD = true,
+			stack = true,
+			stackFunc = function()
+				local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Immolation Aura')
+				if expirationTime then
+					local dura = expirationTime - GetTime()
+					return dura, '%.0f'
+				else
+					return ''
+				end
+			end,
+		},
+		[204596] = { -- Sigil of Flame
+			order = 8,
+			showTimeAfterGCD = true,
+			talent = 112854,
+		},
+		[204157] = { -- Throw Glaive
+			order = 10,
+			range = true,
+			showTimeAfterGCD = true,
+			customRangeSpell = "Consume Magic",
+			stack = true,
+		},
 	}
-	temp.all.row2 = {}
+	temp.all.row2 = {
+		[370965] = { -- The Hunt
+			order = 10,
+			showTimeAfterGCD = true,
+			talent = 112837,
+		},
+		[196718] = { -- Darkness
+			talent = 112921,
+			order = 50,
+		},
+	}
 	temp.all.row3 = {}
-	temp.all.row4 = {}
+	temp.all.row4 = {
+		[217832] = {  -- Imprison
+			talent = 112927,
+		},
+		[202140] = { -- Sigil of Misery
+			talent = 112859,
+		},
+		[188501] = {}, -- Specral Sight
+		[185245] = { -- Torment
+			ignoreGCD = true,
+		},
+
+		[278326] = {  -- Consume Magic
+			talent = 112926
+		},
+		[198793] = { -- Vengeul Retreat
+			talent = 112853,
+			ignoreGCD = true,
+		},
+		[179057] = { -- Chaos Nova
+			talent = 112911,
+			showTimeAfterGCD = true,
+		}
+	}
 	temp.all.row5 = {}
 	temp.all.buffsC = {}
 	temp.all.buffsI = {}
@@ -70,71 +142,18 @@ function iCD:DEMONHUNTER(specID)
 				showTimeAfterGCD = true,
 
 			},
-			[342817] = { -- Glaive Tempest
-				order = 5,
-				showTimeAfterGCD = true,
-				cost = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(3, 3, 1))
-				end,
-			},
-			[258925] = { -- Fel Barrage
-				order = 8,
-				showTimeAfterGCD = true,
-				range = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(7, 3, 1))
-				end,
-			},
-			[232893] = { -- Felblade
-				order = 7,
-				range = true,
-				glow = true,
-				glowSound = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(1, 3, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
-			[185123] = { -- Throw Glaive
-				order = 10,
-				range = true,
-				stack = true,
-				showTimeAfterGCD = true,
-			},
-			[211881] = { -- Fel Eruption
-				order = 10,
-				range = true,
-				cost = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 3, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
-			[258860] = { -- Essence Break
-				order = 10,
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
 		}
 		t.row2 = {
 			[191427] = { -- Metamorphosis
 				order = 5,
 			},
-			[198793] = { -- Vengeful Retreat
-				order = 7,
-			},
-			[195072] = { -- Fel Rush
-				order = 8,
-				stack = true,
-			},
 			[198589] = { -- Blur
 				order = 10,
 			},
-			[196718] = { -- Darkness
-				order = 12,
+			[195072] = { -- Fel Rush
+				order = 1,
+				stack = true,
+				ignoreGCD = true,
 			},
 		}
 		t.row4 = {
@@ -154,10 +173,11 @@ function iCD:DEMONHUNTER(specID)
 				azerite = 245,
 			},
 			[347462] = { -- Unbound Chaos
-				showFunc = function()
-					return select(4, GetTalentInfo(3, 2, 1))
-				end,
+				talent = 112942
 			},
+			[389890] = { -- Tactical Retreat
+				talent = 112944
+			}
 		}
 		t.buffsC = {
 			[212800] = { -- Blur
@@ -200,80 +220,53 @@ function iCD:DEMONHUNTER(specID)
 				range = true,
 				customRangeSpell = 'Shear',
 				stack = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(4, 3, 1))
-				end,
+				talent = 112885,
 				showTimeAfterGCD = true,
-			},
-			[232893] = { -- Felblade
-				order = 3,
-				range = true,
-				glow = true,
-				glowSound = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(1, 3, 1))
-				end,
-				showTimeAfterGCD = true,
-			},
-			[258920] = { -- Immolation Aura
-				order = 6,
-				showTimeAfterGCD = true,
-				stack = true,
-				stackFunc = function()
-					local count, duration, expirationTime, value1, value2, value3 = iCD.UnitBuff('player', 'Immolation Aura')
-					if expirationTime then
-						local dura = expirationTime - GetTime()
-						return dura, '%.0f'
-					else
-						return ''
-					end
-				end,
-			},
-			[204596] = { -- Sigil of Flame
-				order = 8,
-				showTimeAfterGCD = true,
-			},
-			[204157] = { -- Throw Glaive
-				order = 10,
-				range = true,
-				showTimeAfterGCD = true,
-				customRangeSpell = "Consume Magic",
 			},
 			[212084] = { -- Fel Devastation
 				order = 15,
 				cost = true,
 				showTimeAfterGCD = true,
+				talent = 112908
+			},
+			[207407] = { -- Soul Carver
+				order = 22,
+				showTimeAfterGCD = true,
+				talent = 112898,
+			},
+			[390163] = { -- Elysian Decree
+				order = 25,
+				showTimeAfterGCD = true,
+				talent = 112874,
 			},
 		}
 		t.row2 = {
-				[189110] = { -- Infernal Strike
-					order = 1,
-					stack = true,
-					ignoreGCD = true,
-				},
+			[189110] = { -- Infernal Strike
+				order = 1,
+				stack = true,
+				ignoreGCD = true,
+			},
 			[263648] = { -- Soul Barrier
-				order = 2,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 3, 1))
-				end,
+				order = 15,
+				talent = 112870,
 				cost = true,
 			},
 			[204021] = { -- Fiery Brand
-				order = 4,
+				order = 11,
 				range = true,
 				customRangeSpell = "Consume Magic",
+				talent = 112864,
 			},
 			[187827] = { -- Metamorphosis
 				order = 5,
 			},
 			[202137] = { -- Sigil of Silence
-				order = 6,
+				order = 20,
+				talent = 112904,
 			},
 			[202138] = { -- Sigil of Chains
-				order = 8,
-				showFunc = function()
-					return select(4, GetTalentInfo(5, 3, 1))
-				end,
+				order = 25,
+				talent = 112867,
 			},
 
 		}
@@ -296,14 +289,7 @@ function iCD:DEMONHUNTER(specID)
 			},
 		}
 		t.row4 = {
-			[217832] = {}, -- Imprison
-			[202140] = {}, -- Sigil of Misery
-			[188501] = {}, -- Specral Sight
-			[185245] = { -- Torment
-				ignoreGCD = true,
-			},
 
-			[278326] = {}, -- Consume Magic
 		}
 		t.row5 = {
 			[207771] = { -- Fiery Brand
@@ -329,9 +315,7 @@ function iCD:DEMONHUNTER(specID)
 			},
 			[247456] = {
 				debuff = true,
-				showFunc = function()
-					return select(4, GetTalentInfo(6, 2, 1))
-				end,
+				talent = 112907,
 			},
 		}
 		t.buffsC = {

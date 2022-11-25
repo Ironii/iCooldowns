@@ -3,7 +3,14 @@ function iCD:WARLOCK(specID)
 	local temp = {}
 	temp.spec = {}
 	temp.all = {}
-	temp.all.row1 = {}
+	temp.all.row1 = {
+		[325640] = { -- Soul Rot
+			order = 999999, -- Always last
+			showTimeAfterGCD = true,
+			range = true,
+			covenant = iCD.covenants.NIGHTFAE
+		},
+	}
 	temp.all.row2 = {}
 	temp.all.row3 = {}
 	temp.all.row4 = {}
@@ -411,7 +418,7 @@ function iCD:WARLOCK(specID)
 						order = 10,
 						cost = true,
 						showFunc = function()
-							return select(4, GetTalentInfo(4, 3, 1))
+							return select(4, GetTalentInfo(2, 3, 1))
 						end,
 						showTimeAfterCast = true,
 					},

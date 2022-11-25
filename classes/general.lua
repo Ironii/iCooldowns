@@ -379,6 +379,7 @@ function iCD:GetGenerals(specID)
 			[-186428] = {  -- Shadowed Orb of Torment
 				ignoreGCD = true,
 			},
+			[-188265] = {}, -- Cache of Acquired Treasures
 		}
 		t.row5 = { -- Buffs
 			[310143] = { -- Soulshape
@@ -482,7 +483,9 @@ function iCD:GetGenerals(specID)
 			[328622] = { -- Blessing of Seasons (Autumn)
 				stack = "cdr"
 			},
-
+			[366438] = { -- Genesis Lathe
+				itemReq = 189754,
+			},
 		}
 		t.buffsC = {
 			[356042] = { -- Soul Fragment (domination socket)
@@ -749,6 +752,13 @@ function iCD:GetGenerals(specID)
 			},
 			[328620] = {}, -- Blessing of Seasons (Summer)
 			[328281] = {}, -- Blessing of Seasons (Winter)
+			[332514] = { -- Bron's Call to Action (stacking)
+				stack = true,
+				covenant = iCD.covenants.KYRIAN
+			},
+			[333961] = { -- Bron's Call to Action
+				covenant = iCD.covenants.KYRIAN
+			}
 		}
 	return t
 end
